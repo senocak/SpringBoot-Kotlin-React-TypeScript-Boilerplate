@@ -1,0 +1,6 @@
+appName_IS_UNDEFINED > [35m14:51:14.526[0;39m [1;31m[Test worker][0;39m ERROR [userId: ]  [36mc.g.senocak.auth.service.RoleService[0;39m - [34mUser Role is not found
+[0;39mappName_IS_UNDEFINED > [35m14:53:17.238[0;39m [1;31m[Test worker][0;39m ERROR [userId: ]  [36mc.g.senocak.auth.service.RoleService[0;39m - [34mUser Role is not found
+[0;39mappName_IS_UNDEFINED > [35m14:53:40.461[0;39m [1;31m[Test worker][0;39m ERROR [userId: ]  [36mc.g.senocak.auth.service.RoleService[0;39m - [34mUser Role is not found
+[0;39mappName_IS_UNDEFINED > [35m14:58:44.666[0;39m [1;31m[Test worker][0;39m ERROR [userId: ]  [36mc.g.s.auth.controller.UserController[0;39m - [34mnull
+[0;39mappName_IS_UNDEFINED > [35m14:58:44.687[0;39m [1;31m[Test worker][0;39m ERROR [userId: ]  [36mc.g.s.auth.controller.UserController[0;39m - [34mnull
+[0;39m

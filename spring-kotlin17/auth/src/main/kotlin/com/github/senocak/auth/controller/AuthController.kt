@@ -221,10 +221,9 @@ class AuthController(
     ])
     fun resetPassword(
         @Parameter(description = "Email", required = true, `in` = ParameterIn.PATH) @PathVariable @Email(message = "{invalid_email}") email: String
-    ): Map<String, String> {
+    ): Map<String, String> =
         userService.passwordReset(email = email)
-        return mapOf("message" to messageSourceService.get(code = "password_reset_link_sent"))
-    }
+            .run { mapOf("message" to messageSourceService.get(code = "password_reset_link_sent")) }
 
     @PostMapping("/change-password/{token}")
     @Operation(
@@ -239,10 +238,9 @@ class AuthController(
         @RequestBodySchema(description = "Request body to change password", required = true, content = [Content(mediaType = MediaType.APPLICATION_JSON_VALUE)])
         @RequestBody request: ChangePasswordRequest,
         @Parameter(description = "Request body to change password", required = true, `in` = ParameterIn.PATH) @PathVariable token: String
-    ): Map<String, String> {
+    ): Map<String, String> =
         userService.changePassword(request = request, token = token)
-        return mapOf("message" to messageSourceService.get(code = "password_changed_success"))
-    }
+            .run { mapOf("message" to messageSourceService.get(code = "password_changed_success")) }
 
     @PostMapping("/logout")
     @Authorize(roles = [AppConstants.ADMIN, AppConstants.USER])

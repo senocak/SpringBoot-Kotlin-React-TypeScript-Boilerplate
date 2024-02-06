@@ -4,10 +4,13 @@ import com.github.senocak.auth.TestConstants
 import com.github.senocak.auth.createTestUser
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.dto.UpdateUserDto
+import com.github.senocak.auth.domain.dto.UserPaginationDTO
 import com.github.senocak.auth.domain.dto.UserResponse
 import com.github.senocak.auth.domain.dto.UserWrapperResponse
 import com.github.senocak.auth.exception.ServerException
+import com.github.senocak.auth.service.MessageSourceService
 import com.github.senocak.auth.service.UserService
+import com.github.senocak.auth.util.OmaErrorMessageType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
@@ -26,15 +29,24 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.http.HttpStatus
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 @DisplayName("Unit Tests for UserController")
 class UserControllerTest {
     @InjectMocks lateinit var userController: UserController
-    private val userService: UserService = Mockito.mock()
-    private val passwordEncoder: PasswordEncoder = Mockito.mock()
-    private val bindingResult: BindingResult = Mockito.mock()
+    private val userService: UserService = mock<UserService>()
+    private val passwordEncoder: PasswordEncoder = mock<PasswordEncoder>()
+    private val messageSourceService: MessageSourceService = mock<MessageSourceService>()
+    private val bindingResult: BindingResult = mock<BindingResult>()
     private val user: User = createTestUser()
 
     @Nested
@@ -105,12 +117,65 @@ class UserControllerTest {
             updateUserDto.name = TestConstants.USER_NAME
             updateUserDto.password = "pass1"
             updateUserDto.passwordConfirmation = "pass1"
+            doReturn(value = "pass1").`when`(passwordEncoder).encode("pass1")
+            doReturn(value = user).`when`(userService).save(user = user)
             // When
             val patchMe: UserResponse = userController.patchMe(httpServletRequest, updateUserDto, bindingResult)
             // Then
             assertNotNull(patchMe)
             assertEquals(user.email, patchMe.email)
             assertEquals(user.name, patchMe.name)
+        }
+    }
+
+    @Nested
+    internal inner class AllUsersTest {
+
+        @Test
+        @Throws(ServerException::class)
+        fun givenInvalidSortBy_whenAllUsers_thenThrowServerException() {
+            // Given
+            doReturn(value = "invalid_sort_column").`when`(messageSourceService).get(code = "invalid_sort_column")
+            // When
+            val closureToTest = Executable {
+                userController.allUsers(page = 1, size = 1, sortBy = "sortBy", sort = "sort", q = "q")
+            }
+            // Then
+            val assertThrows: ServerException = assertThrows(ServerException::class.java, closureToTest)
+            assertEquals(OmaErrorMessageType.BASIC_INVALID_INPUT, assertThrows.omaErrorMessageType)
+            assertEquals(HttpStatus.BAD_REQUEST, assertThrows.statusCode)
+            assertNotNull(assertThrows.variables)
+            assertEquals(1, assertThrows.variables.size)
+            assertEquals("invalid_sort_column", assertThrows.variables[0])
+        }
+
+        @Test
+        @Throws(ServerException::class)
+        fun given_whenAllUsers_thenAssertResult() {
+            // Given
+            doReturn(value = user).`when`(userService).loggedInUser()
+            val specification: Specification<User> = mock<Specification<User>>()
+            doReturn(value = specification).`when`(userService).createSpecificationForUser(q = "q")
+            val listOfUser: List<User> = listOf(element = user)
+            val pages: Page<User> = PageImpl(listOfUser)
+            doReturn(value = pages).`when`(userService).findAllUsers(specification = eq(specification), pageRequest = any<Pageable>())
+            // When
+            val response: UserPaginationDTO = userController.allUsers(page = 1, size = 1, sortBy = "id", sort = "sort", q = "q")
+            // Then
+            assertNotNull(response)
+            assertEquals("id", response.sortBy)
+            assertEquals("sort", response.sort)
+            assertEquals(1, response.page)
+            assertEquals(1, response.pages)
+            assertEquals(1, response.total)
+            assertNotNull(response.items)
+            assertEquals(1, response.items!!.size)
+            assertNotNull(response.items!![0])
+            assertEquals(user.name, response.items!![0].name)
+            assertEquals(user.email, response.items!![0].email)
+            assertNotNull(response.items!![0].roles)
+            assertEquals(2, response.items!![0].roles.size)
+            assertNotNull(response.items!![0].emailActivatedAt)
         }
     }
 }

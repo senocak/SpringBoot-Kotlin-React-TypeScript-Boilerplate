@@ -82,10 +82,10 @@ class RestExceptionHandler(
             omaErrorMessageType = OmaErrorMessageType.NOT_FOUND, variables = arrayOf(ex.message))
 
     @ExceptionHandler(BindException::class)
-    fun handleBindException(e: BindException): ResponseEntity<Any> =
+    fun handleBindException(ex: BindException): ResponseEntity<Any> =
         arrayListOf(messageSourceService.get(code = "validation_error"))
             .apply {
-                e.bindingResult.allErrors.forEach(Consumer { error: ObjectError ->
+                ex.bindingResult.allErrors.forEach(Consumer { error: ObjectError ->
                     this.add(element = "${(error as FieldError).field}: ${error.defaultMessage}")
                 })
             }

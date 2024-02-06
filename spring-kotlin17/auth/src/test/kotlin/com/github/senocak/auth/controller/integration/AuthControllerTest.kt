@@ -7,6 +7,7 @@ import com.github.senocak.auth.TestConstants.USER_NAME
 import com.github.senocak.auth.TestConstants.USER_PASSWORD
 import com.github.senocak.auth.config.SpringBootTestConfig
 import com.github.senocak.auth.controller.AuthController
+import com.github.senocak.auth.controller.BaseController
 import com.github.senocak.auth.domain.Role
 import com.github.senocak.auth.domain.RoleRepository
 import com.github.senocak.auth.domain.dto.LoginRequest
@@ -73,7 +74,7 @@ class AuthControllerTest {
         fun givenInvalidSchema_whenLogin_thenThrowServerException() {
             // Given
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/login")
+                .post("${BaseController.V1_AUTH_URL}/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(loginRequest))
             // When
@@ -102,7 +103,7 @@ class AuthControllerTest {
             loginRequest.email = "USERNAME"
             loginRequest.password = "PASSWORD"
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/login")
+                .post("${BaseController.V1_AUTH_URL}/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(loginRequest))
             // When
@@ -131,7 +132,7 @@ class AuthControllerTest {
             loginRequest.email = "asenocakUser"
             loginRequest.password = "asenocak"
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/login")
+                .post("${BaseController.V1_AUTH_URL}/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(loginRequest))
             // When
@@ -160,7 +161,7 @@ class AuthControllerTest {
         fun givenInvalidSchema_whenRegister_thenThrowServerException() {
             // Given
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/register")
+                .post("${BaseController.V1_AUTH_URL}/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(registerRequest))
             // When
@@ -191,7 +192,7 @@ class AuthControllerTest {
             registerRequest.email = USER_EMAIL
             registerRequest.password = USER_PASSWORD
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/register")
+                .post("${BaseController.V1_AUTH_URL}/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(registerRequest))
             // When
@@ -221,7 +222,7 @@ class AuthControllerTest {
             registerRequest.email = USER_EMAIL
             registerRequest.password = USER_PASSWORD
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/register")
+                .post("${BaseController.V1_AUTH_URL}/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(registerRequest))
             // When
@@ -252,7 +253,7 @@ class AuthControllerTest {
             registerRequest.email = "userNew@email.com"
             registerRequest.password = USER_PASSWORD
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/register")
+                .post("${BaseController.V1_AUTH_URL}/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(registerRequest))
             // When
@@ -282,7 +283,7 @@ class AuthControllerTest {
             registerRequest.email = "userNew@email.com"
             registerRequest.password = USER_PASSWORD
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .post("${AuthController.URL}/register")
+                .post("${BaseController.V1_AUTH_URL}/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(registerRequest))
             // When

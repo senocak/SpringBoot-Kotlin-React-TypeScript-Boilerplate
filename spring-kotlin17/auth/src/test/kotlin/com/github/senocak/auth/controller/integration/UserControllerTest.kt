@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.senocak.auth.TestConstants
 import com.github.senocak.auth.config.SpringBootTestConfig
+import com.github.senocak.auth.controller.BaseController
 import com.github.senocak.auth.controller.UserController
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.UserRepository
@@ -68,7 +69,7 @@ class UserControllerTest {
         fun given_whenGetMe_thenReturn200() {
             // Given
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .get(UserController.URL + "/me")
+                .get(BaseController.V1_USER_URL + "/me")
             // When
             val perform: ResultActions = mockMvc.perform(requestBuilder)
             // Then
@@ -94,7 +95,7 @@ class UserControllerTest {
             // Given
             updateUserDto.name = "as"
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .patch(UserController.URL + "/me")
+                .patch(BaseController.V1_USER_URL + "/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(updateUserDto))
             // When
@@ -122,7 +123,7 @@ class UserControllerTest {
             updateUserDto.password = TestConstants.USER_NAME
             updateUserDto.passwordConfirmation = "invalid"
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .patch(UserController.URL + "/me")
+                .patch(BaseController.V1_USER_URL + "/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(updateUserDto))
             // When
@@ -148,7 +149,7 @@ class UserControllerTest {
             updateUserDto.password = TestConstants.USER_PASSWORD
             updateUserDto.passwordConfirmation = TestConstants.USER_PASSWORD
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .patch(UserController.URL + "/me")
+                .patch(BaseController.V1_USER_URL + "/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(writeValueAsString(updateUserDto))
             // When

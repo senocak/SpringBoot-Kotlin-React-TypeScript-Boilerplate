@@ -1,9 +1,9 @@
 package com.github.senocak.auth.service
 
-import com.github.senocak.domain.User
-import com.github.senocak.factory.UserFactory.createUser
-import com.github.senocak.repository.UserRepository
-import org.junit.jupiter.api.Assertions
+import com.github.senocak.auth.createTestUser
+import com.github.senocak.auth.domain.PasswordResetTokenRepository
+import com.github.senocak.auth.domain.User
+import com.github.senocak.auth.domain.UserRepository
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -14,91 +14,76 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import java.util.Optional
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.mockito.InjectMocks
+import org.mockito.Mockito.`when`
+import org.mockito.kotlin.doReturn
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.core.userdetails.User as SecurityUser
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 @DisplayName("Unit Tests for UserService")
 class UserServiceTest {
-    private val userRepository = Mockito.mock(UserRepository::class.java)
-    private var userService = UserService(userRepository)
-    private var auth = Mockito.mock(Authentication::class.java)
-    private var user = Mockito.mock(org.springframework.security.core.userdetails.User::class.java)
-
-    @Test
-    fun givenUsername_whenFindByUsername_thenAssertResult() {
-        // Given
-        val user: User = createUser()
-        Mockito.doReturn(Optional.of<Any>(user)).`when`(userRepository).findByUsername("username")
-        // When
-        val findByUsername: User? = userService.findByUsername("username")
-        // Then
-        Assertions.assertEquals(user, findByUsername)
-    }
-
-    @Test
-    fun givenNullUsername_whenFindByUsername_thenAssertResult() {
-        // When
-        val closureToTest = Executable { userService.findByUsername("username") }
-        // Then
-        Assertions.assertThrows(UsernameNotFoundException::class.java, closureToTest)
-    }
-
-    @Test
-    fun givenUsername_whenExistsByUsername_thenAssertResult() {
-        // When
-        val existsByUsername = userService.existsByUsername("username")
-        // Then
-        Assertions.assertFalse(existsByUsername)
-    }
-
-    @Test
-    fun givenUsername_whenExistsByEmail_thenAssertResult() {
-        // When
-        val existsByEmail = userService.existsByEmail("username")
-        // Then
-        Assertions.assertFalse(existsByEmail)
-    }
+    @InjectMocks lateinit var userService: UserService
+    private val userRepository: UserRepository = Mockito.mock(UserRepository::class.java)
+    private val messageSourceService: MessageSourceService = Mockito.mock(MessageSourceService::class.java)
+    private val emailActivationTokenService: EmailActivationTokenService = Mockito.mock(EmailActivationTokenService::class.java)
+    private val passwordResetTokenRepository: PasswordResetTokenRepository = Mockito.mock(PasswordResetTokenRepository::class.java)
+    private val emailService: EmailService = Mockito.mock(EmailService::class.java)
+    private val passwordEncoder: PasswordEncoder = Mockito.mock(PasswordEncoder::class.java)
+    private var auth: Authentication = Mockito.mock(Authentication::class.java)
+    private var securityUser: SecurityUser = Mockito.mock(SecurityUser::class.java)
 
     @Test
     fun givenEmail_whenFindByUsername_thenAssertResult() {
         // Given
-        val user: User = createUser()
-        Mockito.doReturn(Optional.of<Any>(user)).`when`(userRepository).findByEmail("Email")
+        val user: User = createTestUser()
+        doReturn(value = user).`when`(userRepository).findByEmail(email = "email")
         // When
-        val findByEmail: User? = userService.findByEmail("Email")
+        val findByUsername: User = userService.findByEmail(email = "email")
         // Then
-        Assertions.assertEquals(user, findByEmail)
+        assertEquals(user, findByUsername)
     }
 
     @Test
     fun givenNullEmail_whenFindByEmail_thenAssertResult() {
         // When
-        val closureToTest = Executable { userService.findByEmail("Email") }
+        val closureToTest = Executable { userService.findByEmail(email = "email") }
         // Then
-        Assertions.assertThrows(UsernameNotFoundException::class.java, closureToTest)
+        assertThrows(UsernameNotFoundException::class.java, closureToTest)
+    }
+
+    @Test
+    fun givenUsername_whenExistsByEmail_thenAssertResult() {
+        // When
+        val existsByEmail: Boolean = userService.existsByEmail("username")
+        // Then
+        assertFalse(existsByEmail)
     }
 
     @Test
     fun givenUser_whenSave_thenAssertResult() {
         // Given
-        val user: User = createUser()
-        Mockito.doReturn(user).`when`(userRepository).save<User>(user)
+        val user: User = createTestUser()
+        doReturn(value = user).`when`(userRepository).save<User>(user)
         // When
         val save: User = userService.save(user)
         // Then
-        Assertions.assertEquals(user, save)
+        assertEquals(user, save)
     }
 
     @Test
     fun givenUser_whenCreate_thenAssertResult() {
         // Given
-        val user: User = createUser()
-        Mockito.`when`(userRepository.save(user)).thenReturn(user)
+        val user: User = createTestUser()
+        `when`(userRepository.save(user)).thenReturn(user)
         // When
         val create: User = userService.save(user)
         // Then
-        Assertions.assertEquals(user, create)
+        assertEquals(user, create)
     }
 
     @Test
@@ -106,30 +91,30 @@ class UserServiceTest {
         // When
         val closureToTest = Executable { userService.loadUserByUsername("username") }
         // Then
-        Assertions.assertThrows(UsernameNotFoundException::class.java, closureToTest)
+        assertThrows(UsernameNotFoundException::class.java, closureToTest)
     }
 
     @Test
     fun givenUsername_whenLoadUserByUsername_thenAssertResult() {
         // Given
-        val user: User = createUser()
-        Mockito.doReturn(Optional.of<Any>(user)).`when`(userRepository).findByUsername("username")
+        val user: User = createTestUser()
+        doReturn(value = user).`when`(userRepository).findByEmail(email = "email")
         // When
-        val loadUserByUsername = userService.loadUserByUsername("username")
+        val loadUserByUsername: org.springframework.security.core.userdetails.User = userService.loadUserByUsername(email = "email")
         // Then
-        Assertions.assertEquals(user.username, loadUserByUsername.username)
+        assertEquals(user.email, loadUserByUsername.username)
     }
 
     @Test
     fun givenNotLoggedIn_whenLoadUserByUsername_thenAssertResult() {
         // Given
         SecurityContextHolder.getContext().authentication = auth
-        Mockito.doReturn(user).`when`(auth).principal
-        Mockito.doReturn("user").`when`(user).username
+        doReturn(value = securityUser).`when`(auth).principal
+        doReturn(value = "user").`when`(securityUser).username
         // When
         val closureToTest = Executable { userService.loggedInUser() }
         // Then
-        Assertions.assertThrows(UsernameNotFoundException::class.java, closureToTest)
+        assertThrows(UsernameNotFoundException::class.java, closureToTest)
     }
 
     @Test
@@ -137,13 +122,13 @@ class UserServiceTest {
     fun givenLoggedIn_whenLoadUserByUsername_thenAssertResult() {
         // Given
         SecurityContextHolder.getContext().authentication = auth
-        Mockito.doReturn(user).`when`(auth).principal
-        Mockito.doReturn("username").`when`(user).username
-        val user: User = createUser()
-        Mockito.doReturn(Optional.of<Any>(user)).`when`(userRepository).findByUsername("username")
+        doReturn(value = securityUser).`when`(auth).principal
+        doReturn(value = "email").`when`(securityUser).username
+        val user: User = createTestUser()
+        doReturn(value = user).`when`(userRepository).findByEmail(email = "email")
         // When
-        val loggedInUser: User? = userService.loggedInUser()
+        val loggedInUser: User = userService.loggedInUser()
         // Then
-        Assertions.assertEquals(user.username, loggedInUser!!.username)
+        assertEquals(user.email, loggedInUser.email)
     }
 }

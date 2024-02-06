@@ -108,7 +108,9 @@ class UserController(
             user.password = passwordEncoder.encode(password)
         }
         return userService.save(user = user)
-            .run { this.convertEntityToDto() }
+            .run user@ {
+                this@user.convertEntityToDto()
+            }
     }
 
     @Throws(ServerException::class)

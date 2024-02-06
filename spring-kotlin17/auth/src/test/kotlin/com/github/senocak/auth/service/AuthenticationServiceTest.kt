@@ -1,6 +1,6 @@
 package com.github.senocak.auth.service
 
-import com.github.senocak.TestConstants
+import com.github.senocak.auth.TestConstants
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -16,14 +16,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import java.nio.file.AccessDeniedException
+import org.mockito.InjectMocks
+import org.mockito.kotlin.mock
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
 @DisplayName("Unit Tests for AuthenticationService")
 class AuthenticationServiceTest {
-    private val authenticationService = AuthenticationService()
-    var auth: Authentication = Mockito.mock(Authentication::class.java)
-    var user: User? = null
+    @InjectMocks val authenticationService = AuthenticationService()
+    private var auth: Authentication = mock<Authentication>()
+    private var user: User? = null
 
     @BeforeEach
     fun initSecurityContext() {
@@ -44,7 +46,7 @@ class AuthenticationServiceTest {
         // Given
         val authorities: MutableList<GrantedAuthority> = ArrayList()
         authorities.add(SimpleGrantedAuthority("ROLE_ADMIN"))
-        user = User(TestConstants.USER_USERNAME, TestConstants.USER_PASSWORD, authorities)
+        user = User(TestConstants.USER_EMAIL, TestConstants.USER_PASSWORD, authorities)
         Mockito.doReturn(user).`when`(auth).principal
         // When
         val preHandle: Boolean = authenticationService.isAuthorized(arrayOf("ADMIN"))
@@ -58,7 +60,7 @@ class AuthenticationServiceTest {
         // Given
         val authorities: MutableList<GrantedAuthority> = ArrayList()
         authorities.add(SimpleGrantedAuthority("ROLE_ADMIN"))
-        user = User(TestConstants.USER_USERNAME, TestConstants.USER_PASSWORD, authorities)
+        user = User(TestConstants.USER_EMAIL, TestConstants.USER_PASSWORD, authorities)
         Mockito.doReturn(user).`when`(auth).principal
         // When
         val preHandle: Boolean = authenticationService.isAuthorized(arrayOf("USER"))
