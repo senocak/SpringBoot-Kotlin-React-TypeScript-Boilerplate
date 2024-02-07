@@ -5,16 +5,28 @@ import com.github.senocak.auth.util.OmaErrorMessageType
 import org.springframework.http.HttpHeaders
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
+import org.springframework.validation.ObjectError
 import org.springframework.web.bind.annotation.CrossOrigin
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 abstract class BaseController {
     fun validate(resultOfValidation: BindingResult) {
-        if (resultOfValidation.hasErrors())
-            throw ServerException(omaErrorMessageType = OmaErrorMessageType.JSON_SCHEMA_VALIDATOR,
-                    variables = resultOfValidation.fieldErrors.stream()
-                            .map { fieldError: FieldError? -> "${fieldError?.field}: ${fieldError?.defaultMessage}" }
-                            .toList().toTypedArray())
+        if (resultOfValidation.hasErrors()) {
+            arrayListOf<String>()
+                .apply {
+                    resultOfValidation.fieldErrors.forEach {
+                        fieldError: FieldError? -> this.add(element = "${fieldError?.field}: ${fieldError?.defaultMessage}")
+                    }
+                }
+                .apply {
+                    resultOfValidation.globalErrors.forEach { err: ObjectError? ->
+                        this.add(element = "${err?.defaultMessage}")
+                    }
+                }
+                .run {
+                    throw ServerException(omaErrorMessageType = OmaErrorMessageType.JSON_SCHEMA_VALIDATOR, variables = this.toTypedArray())
+                }
+        }
     }
 
     /**
