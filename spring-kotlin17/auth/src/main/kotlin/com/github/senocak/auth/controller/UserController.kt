@@ -30,7 +30,6 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.constraints.Pattern
 import org.slf4j.Logger
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -114,9 +113,6 @@ class UserController(
                 this@user.convertEntityToDto()
             }
     }
-
-    @Value("\${spring.data.web.pageable.default-page-size:10}")
-    private lateinit var host: String
 
     @Throws(ServerException::class)
     @Operation(
