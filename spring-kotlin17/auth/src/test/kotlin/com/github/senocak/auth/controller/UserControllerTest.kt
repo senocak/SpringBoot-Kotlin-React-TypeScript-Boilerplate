@@ -133,7 +133,7 @@ class UserControllerTest {
         @Throws(ServerException::class)
         fun givenInvalidSortBy_whenAllUsers_thenThrowServerException() {
             // Given
-            doReturn(value = "invalid_sort_column").`when`(messageSourceService).get(code = "invalid_sort_column")
+            doReturn(value = "invalid_sort_column").`when`(messageSourceService).get(code = "invalid_sort_column", params = arrayOf("sortBy"))
             // When
             val closureToTest = Executable {
                 userController.allUsers(page = 1, size = 1, sortBy = "sortBy", sort = "sort", q = "q")

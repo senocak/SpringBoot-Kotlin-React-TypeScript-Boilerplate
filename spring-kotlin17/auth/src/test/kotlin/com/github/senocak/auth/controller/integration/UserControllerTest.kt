@@ -232,10 +232,10 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.page", equalTo(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.pages", equalTo(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.total", equalTo(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.total", equalTo(6)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.sort", equalTo("asc")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.sortBy", equalTo("id")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items", hasSize<Any>(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items", hasSize<Any>(6)))
         }
     }
 
