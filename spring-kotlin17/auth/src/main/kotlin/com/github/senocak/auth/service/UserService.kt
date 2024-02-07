@@ -164,7 +164,7 @@ class UserService(
                 .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
                     statusCode = HttpStatus.BAD_REQUEST, variables = arrayOf(this)) }
 
-        if (user.password.equals(request.password))
+        if (passwordEncoder.matches(request.password, user.password))
             messageSourceService.get(code = "new_password_must_be_different_from_old")
                 .apply { log.error(this) }
                 .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,

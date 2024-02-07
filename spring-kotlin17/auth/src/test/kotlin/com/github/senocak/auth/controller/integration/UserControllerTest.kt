@@ -3,6 +3,7 @@ package com.github.senocak.auth.controller.integration
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.senocak.auth.TestConstants
+import com.github.senocak.auth.TestConstants.USER_EMAIL
 import com.github.senocak.auth.config.SpringBootTestConfig
 import com.github.senocak.auth.controller.BaseController
 import com.github.senocak.auth.controller.UserController
@@ -11,10 +12,13 @@ import com.github.senocak.auth.domain.UserRepository
 import com.github.senocak.auth.domain.dto.UpdateUserDto
 import com.github.senocak.auth.exception.RestExceptionHandler
 import com.github.senocak.auth.exception.ServerException
+import com.github.senocak.auth.service.MessageSourceService
 import com.github.senocak.auth.service.UserService
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.RoleName
 import org.hamcrest.Matchers
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
 import org.hamcrest.core.IsEqual
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -36,7 +40,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 /**
  * This integration test class is written for
  * @see UserController
- * 5 tests
  */
 @SpringBootTestConfig
 @DisplayName("Integration Tests for UserController")
@@ -45,6 +48,7 @@ class UserControllerTest {
     @Autowired private lateinit var objectMapper: ObjectMapper
     @Autowired private lateinit var userRepository: UserRepository
     @MockBean  private lateinit var userService: UserService
+    @Autowired private lateinit var messageSourceService: MessageSourceService
 
     private lateinit var mockMvc: MockMvc
     private lateinit var user: User
@@ -53,9 +57,9 @@ class UserControllerTest {
     @Throws(ServerException::class)
     fun beforeEach() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
-            .setControllerAdvice(RestExceptionHandler::class.java)
+            .setControllerAdvice(RestExceptionHandler(messageSourceService = messageSourceService))
             .build()
-        user = userRepository.findAll().first()
+        user = userRepository.findByEmail(email = USER_EMAIL) ?: throw RuntimeException("user not found: $USER_EMAIL")
         doReturn(value = user).`when`(userService).loggedInUser()
     }
 
@@ -69,16 +73,16 @@ class UserControllerTest {
         fun given_whenGetMe_thenReturn200() {
             // Given
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .get(BaseController.V1_USER_URL + "/me")
+                .get("${BaseController.V1_USER_URL}/me")
             // When
             val perform: ResultActions = mockMvc.perform(requestBuilder)
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user.name", IsEqual.equalTo(user.name)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user.email", IsEqual.equalTo(user.email)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user.roles", Matchers.hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.user.roles[0].name", IsEqual.equalTo(RoleName.ROLE_USER.role)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.user.name", equalTo(user.name)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.user.email", equalTo(user.email)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.user.roles", hasSize<Any>(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.user.roles[0].name", equalTo(RoleName.ROLE_USER.role)))
         }
     }
 

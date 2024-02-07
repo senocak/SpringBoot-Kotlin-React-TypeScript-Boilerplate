@@ -144,8 +144,8 @@ class JwtTokenProvider(
 
     fun findByTokenAndThrowException(token: String): JwtToken =
         findByToken(token = token)
-            ?: throw ServerException(omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
-                variables = arrayOf(messageSourceService.get(code = "token_not_found_in_redis")), statusCode = HttpStatus.NOT_FOUND)
+            ?: throw ServerException(omaErrorMessageType = OmaErrorMessageType.NOT_FOUND, statusCode = HttpStatus.NOT_FOUND,
+                variables = arrayOf(messageSourceService.get(code = "token_not_found_in_redis")))
 
     fun findByToken(token: String): JwtToken? = jwtTokenRepository.findByToken(token = token)
 

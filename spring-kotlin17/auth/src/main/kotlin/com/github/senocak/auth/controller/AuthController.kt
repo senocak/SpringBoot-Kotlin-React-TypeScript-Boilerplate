@@ -236,7 +236,7 @@ class AuthController(
     ])
     fun changePassword(
         @RequestBodySchema(description = "Request body to change password", required = true, content = [Content(mediaType = MediaType.APPLICATION_JSON_VALUE)])
-        @RequestBody request: ChangePasswordRequest,
+        @RequestBody @Validated request: ChangePasswordRequest,
         @Parameter(description = "Request body to change password", required = true, `in` = ParameterIn.PATH) @PathVariable token: String
     ): Map<String, String> =
         userService.changePassword(request = request, token = token)
@@ -253,8 +253,7 @@ class AuthController(
                 content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))),
             ApiResponse(responseCode = "500", description = "internal server error occurred",
                 content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-        ]
-    )
+    ])
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Throws(ServerException::class)
     fun logout(request: HttpServletRequest) =

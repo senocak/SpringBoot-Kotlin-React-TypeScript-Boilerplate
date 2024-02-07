@@ -69,13 +69,11 @@ class UserControllerTest {
             // Given
             doReturn(value = user).`when`(userService).loggedInUser()
             // When
-            val getMe: UserWrapperResponse = userController.me()
+            val getMe: UserResponse = userController.me()
             // Then
             assertNotNull(getMe)
-            assertNotNull(getMe.userResponse)
-            assertEquals(user.email, getMe.userResponse.email)
-            assertEquals(user.name, getMe.userResponse.name)
-            assertNull(getMe.token)
+            assertEquals(user.email, getMe.email)
+            assertEquals(user.name, getMe.name)
         }
     }
 

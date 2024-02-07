@@ -1,5 +1,6 @@
 package com.github.senocak.auth.service
 
+import com.github.senocak.auth.domain.EmailActivationToken
 import com.github.senocak.auth.domain.JwtToken
 import com.github.senocak.auth.domain.PasswordResetToken
 import com.github.senocak.auth.domain.UserEmailActivationSendEvent
@@ -29,6 +30,15 @@ class Listeners(
         event.user
             .also { MDC.put("userId", "${event.user.id}") }
             .also { log.info("[UserRegisteredEvent] ${it.email} - ${it.id}") }
+            .also {
+                runCatching {
+                    val findByUser: EmailActivationToken = emailActivationTokenService.findByUser(user = event.user)
+                    log.warn("There is already one EmailActivationToken: $findByUser")
+                    return
+                }.onFailure {
+                    log.warn("EmailActivationToken not found and new will be created: ${it.message}")
+                }
+            }
             .run { emailActivationTokenService.create(user = this) }
             .run { emailService.sendUserEmailActivation(user = user!!, emailActivationToken = this) }
             .also { MDC.remove("userId") }

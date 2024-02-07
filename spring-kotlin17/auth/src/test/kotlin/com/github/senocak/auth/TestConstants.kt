@@ -6,7 +6,8 @@ object TestConstants {
     val CONTAINER_WAIT_TIMEOUT: Duration = Duration.ofMinutes(2)
     const val USER_NAME = "anil senocak"
     const val USER_EMAIL = "anil1@senocak.com"
-    const val USER_PASSWORD = "asenocak"
+    const val USER_PASSWORD = "stanford.Pollich14"
+    const val USER_PASSWORD_HASH = "$2a$10$/ES5OgtWqva1aiGu/oE9HOpSmOvMFYOGamv/WM9wQUcQClqCMyWzy"
     const val JWT_TOKEN_BLACK_LISTED =
         "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhc2Vub2Nha0FkbWluIiwicm9sZXMiOlsiQURNSU4iXSwidHlwZSI6Imp3dCIsImV4cCI6MTY1MzY0MzE2NywiaWF0IjoxNjUzNjQyODY3fQ.bxeIA_BjlsQQDIK35KY6Qdrm7jhbZ2DAiEMGBpwCz5NQacqDv4PnEoBY_wojRapjtiU9Uzo5NLp-eV_e6pIWLg"
     const val REFRESH_TOKEN_BLACK_LISTED =

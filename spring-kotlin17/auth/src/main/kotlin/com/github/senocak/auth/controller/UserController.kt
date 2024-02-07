@@ -66,7 +66,7 @@ class UserController(
         security = [SecurityRequirement(name = SECURITY_SCHEME_NAME, scopes = [ADMIN, USER])]
     )
     @GetMapping("/me")
-    fun me(): UserWrapperResponse = UserWrapperResponse(userResponse = userService.loggedInUser().convertEntityToDto())
+    fun me(): UserResponse = userService.loggedInUser().convertEntityToDto()
 
     @PatchMapping("/me")
     @Operation(

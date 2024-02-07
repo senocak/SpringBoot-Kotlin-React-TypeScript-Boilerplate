@@ -18,10 +18,10 @@ class UserWrapperResponse(
     var userResponse: UserResponse,
 
     @Schema(example = "eyJraWQiOiJ...", description = "Jwt Token", required = false, name = "token", type = "String")
-    var token: String? = null,
+    var token: String,
 
     @Schema(example = "eyJraWQiOiJ...", description = "Refresh Token", required = false, name = "token", type = "String")
-    var refreshToken: String? = null
+    var refreshToken: String
 ): BaseDto()
 
 data class LoginRequest(
