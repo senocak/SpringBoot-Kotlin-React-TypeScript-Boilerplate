@@ -29,7 +29,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.constraints.Pattern
+import java.util.Arrays
+import java.util.stream.Collectors
 import org.slf4j.Logger
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -114,6 +118,9 @@ class UserController(
             }
     }
 
+    @Value("\${spring.data.web.pageable.default-page-size}")
+    private lateinit var jwtExpirationInMs: String
+
     @Throws(ServerException::class)
     @Operation(
         summary = "All Users",
@@ -129,8 +136,13 @@ class UserController(
     @Authorize(roles = [ADMIN])
     @GetMapping
     fun allUsers(
+        @Parameter(name = "size", description = "Page size", example = "20")
+        @RequestParam(defaultValue = "\${spring.data.web.pageable.default-page-size:10}", required = false)
+        parentId: String? = "4",
+
         @Parameter(name = "page", description = "Page number", example = DEFAULT_PAGE_NUMBER) @RequestParam(defaultValue = "1", required = false) page: Int,
-        @Parameter(name = "size", description = "Page size", example = DEFAULT_PAGE_SIZE) @RequestParam(defaultValue = "\${spring.data.web.pageable.default-page-size:10}", required = false) size: Int,
+        @Parameter(name = "size", description = "Page size", example = DEFAULT_PAGE_SIZE) @RequestParam(defaultValue = DEFAULT_PAGE_SIZE, required = false) size: Int,
+        //@Parameter(name = "size", description = "Page size", example = DEFAULT_PAGE_SIZE) @RequestParam(defaultValue = "\${spring.data.web.pageable.default-page-size:10}", required = false) size: Int,
         @Parameter(name = "sortBy", description = "Sort by column", example = "id") @RequestParam(defaultValue = "id", required = false) sortBy: String,
         @Parameter(name = "sort", description = "Sort direction", schema = Schema(type = "string", allowableValues = ["asc", "desc"])) @RequestParam(defaultValue = "asc", required = false) @Pattern(regexp = "asc|desc") sort: String,
         @Parameter(name = "q", description = "Search keyword", example = "lorem") @RequestParam(required = false) q: String?
@@ -138,7 +150,7 @@ class UserController(
         arrayListOf("id", "name", "email")
             .run {
                 if (this.none { it == sortBy }) {
-                    messageSourceService.get(code = "invalid_sort_column")
+                    messageSourceService.get(code = "invalid_sort_column", params = arrayOf(sortBy))
                         .also { log.error(it) }
                         .run error@ { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
                             variables = arrayOf(this@error), statusCode = HttpStatus.BAD_REQUEST) }

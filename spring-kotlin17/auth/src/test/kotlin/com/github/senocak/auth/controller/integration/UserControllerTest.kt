@@ -190,6 +190,55 @@ class UserControllerTest {
         }
     }
 
+    @Nested
+    @Order(3)
+    @DisplayName("Get All Users")
+    internal inner class GetAllUsersTest {
+        @Test
+        @DisplayName("ServerException is expected since sort column is invalid")
+        fun givenSortColumnIsInvalid_whenPatchMe_thenThrowServerException() {
+            // Given
+            val requestBuilder: RequestBuilder = MockMvcRequestBuilders
+                .get("${BaseController.V1_USER_URL}?sortBy=invalid")
+            // When
+            val perform: ResultActions = mockMvc.perform(requestBuilder)
+            // Then
+            perform
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
+                    IsEqual.equalTo(HttpStatus.BAD_REQUEST.value())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
+                    IsEqual.equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
+                    IsEqual.equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
+                    hasSize<Any>(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
+                    Matchers.containsInAnyOrder(
+                        "Invalid sort column: invalid"
+                    )))
+        }
+
+        @Test
+        @DisplayName("Happy Path")
+        @Throws(Exception::class)
+        fun given_whenGetMe_thenReturn200() {
+            // Given
+            val requestBuilder: RequestBuilder = MockMvcRequestBuilders
+                .get("${BaseController.V1_USER_URL}/me")
+            // When
+            val perform: ResultActions = mockMvc.perform(requestBuilder)
+            // Then
+            perform
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(user.name)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email", equalTo(user.email)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles", hasSize<Any>(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name", equalTo(RoleName.ROLE_ADMIN.role)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.emailActivatedAt", IsNull.notNullValue()))
+        }
+    }
+
     /**
      * @param value -- an object that want to be serialized
      * @return -- string
