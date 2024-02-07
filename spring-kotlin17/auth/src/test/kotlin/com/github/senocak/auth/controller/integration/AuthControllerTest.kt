@@ -12,7 +12,6 @@ import com.github.senocak.auth.domain.EmailActivationToken
 import com.github.senocak.auth.domain.PasswordResetToken
 import com.github.senocak.auth.domain.PasswordResetTokenRepository
 import com.github.senocak.auth.domain.User
-import com.github.senocak.auth.domain.UserRepository
 import com.github.senocak.auth.domain.dto.ChangePasswordRequest
 import com.github.senocak.auth.domain.dto.LoginRequest
 import com.github.senocak.auth.domain.dto.RefreshTokenRequest

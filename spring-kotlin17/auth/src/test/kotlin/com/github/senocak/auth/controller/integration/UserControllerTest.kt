@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -196,7 +195,7 @@ class UserControllerTest {
     internal inner class GetAllUsersTest {
         @Test
         @DisplayName("ServerException is expected since sort column is invalid")
-        fun givenSortColumnIsInvalid_whenPatchMe_thenThrowServerException() {
+        fun givenSortColumnIsInvalid_whenAllUsers_thenThrowServerException() {
             // Given
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
                 .get("${BaseController.V1_USER_URL}?sortBy=invalid")
@@ -222,20 +221,21 @@ class UserControllerTest {
         @Test
         @DisplayName("Happy Path")
         @Throws(Exception::class)
-        fun given_whenGetMe_thenReturn200() {
+        fun given_whenAllUsers_thenReturn200() {
             // Given
             val requestBuilder: RequestBuilder = MockMvcRequestBuilders
-                .get("${BaseController.V1_USER_URL}/me")
+                .get(BaseController.V1_USER_URL)
             // When
             val perform: ResultActions = mockMvc.perform(requestBuilder)
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", equalTo(user.name)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", equalTo(user.email)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.roles", hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.roles[0].name", equalTo(RoleName.ROLE_ADMIN.role)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.emailActivatedAt", IsNull.notNullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.page", equalTo(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pages", equalTo(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.total", equalTo(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.sort", equalTo("asc")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.sortBy", equalTo("id")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items", hasSize<Any>(3)))
         }
     }
 
