@@ -27,8 +27,8 @@ function Login(): React.JSX.Element {
                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)}/>
         <input type="password" placeholder="***" required disabled={loginSlice.isLoading} value={password}
                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)}/>
-        <button disabled={loginSlice.isLoading} onClick={(): void => {dispatch(fetchLogin({email: email, password: password}))}}>Giriş Yap</button>
-        <button onClick={(): void => {dispatch(fetchLogin({email: "anil1@senocak.com", password: password}))}}>Login Admin</button>
+        <button disabled={loginSlice.isLoading} onClick={(): void => {dispatch(fetchLogin({email: email, password: password}))}}>Gönder</button>
+        <button onClick={(): void => {dispatch(fetchLogin({email: "anil1@senocak.com", password: password}))}}>Admin</button>
         {loginSlice.isLoading && <p>Bekleyin...</p>}
         {loginSlice.error !== null &&
             <div>

@@ -17,19 +17,17 @@ function App(): React.JSX.Element {
 
     return <>
         <Link to='/'><button>AnaSayfa</button></Link>
-        <br/>
         {me.response === null
             ?
             <>
-                <Link to='/login'><button>Giriş Yap</button></Link>
-                <Link to='/register'><button>Kayıt Ol</button></Link>
+                <Link to='/auth/login'><button>Giriş Yap</button></Link>
+                <Link to='/auth/register'><button>Kayıt Ol</button></Link>
             </>
             :
             <>
-                {JSON.stringify(me.response)}
-                {isAuthorized && <><br/><Link to={`/admin/users`}>Tüm Kullanıcılar</Link></>}
-                <br/>
-                <Link to={`/logout`}>Çıkış</Link>
+                {isAuthorized && <Link to={`/admin/users`}><button>Tüm Kullanıcılar</button></Link>}
+                <Link to={`/logout`}><button>Çıkış</button></Link>
+                <p>{JSON.stringify(me.response)}</p>
             </>
         }
     </>

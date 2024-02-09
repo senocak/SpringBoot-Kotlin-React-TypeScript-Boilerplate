@@ -11,6 +11,7 @@ import AdminHome from "../components/admin/AdminHome"
 import Users from "../components/admin/Users"
 import Forbidden from "../components/Forbidden"
 import NotFound from "../components/NotFound"
+import Register from "../components/Register";
 
 export type RouteItemType = {
     path: string
@@ -27,9 +28,19 @@ export const routes: Array<RouteItemType> = [
         authRequired: false,
     },
     {
-        path: '/login',
+        path: '/auth',
         authRequired: false,
-        component: Login
+        component: Login,
+        routes: [
+            {
+                path: '/login',
+                component: Login
+            },
+            {
+                path: '/register',
+                component: Register
+            }
+        ]
     },
     {
         path: '/admin',

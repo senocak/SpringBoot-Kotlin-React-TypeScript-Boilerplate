@@ -2,7 +2,7 @@ import { AxiosError } from 'axios'
 import AbstractHttpClient from './AbstractHttpClient'
 import history from '../history'
 import app from "../../config/app"
-import { ILoginParams } from "../../store/types/auth"
+import {ILoginParams, IRegisterParams} from "../../store/types/auth"
 
 export default class AuthApiClient extends AbstractHttpClient {
     /**
@@ -57,6 +57,9 @@ export default class AuthApiClient extends AbstractHttpClient {
 
     public login = async (params: ILoginParams) =>
         await this.instance.post('/auth/login', params)
+
+    public register = async (params: IRegisterParams) =>
+        await this.instance.post('/auth/register', params)
 
     /**
      * Refresh token.
