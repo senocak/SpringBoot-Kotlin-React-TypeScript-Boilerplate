@@ -5,10 +5,10 @@ import { IState } from '../../types/global'
 
 const authApiClient: AuthApiClient = AuthApiClient.getInstance()
 
-export const fetchRegister = createAsyncThunk('auth/fetchRegister',
-                                        async (params: IRegisterParams, { rejectWithValue }) => {
+export const fetchActivate = createAsyncThunk('auth/fetchActivate',
+                                        async (token: string, { rejectWithValue }) => {
     try {
-        const { data } = await authApiClient.register(params)
+        const { data } = await authApiClient.activate(token)
         return data
     } catch (error: any) {
         if (!error.response) {
@@ -25,26 +25,26 @@ const initialState: IState<IRegisterResponse> = {
     error: null
 }
 
-const authRegisterSlice = createSlice({
-    name: 'auth/register',
+const authActivateSlice = createSlice({
+    name: 'auth/activate',
     initialState,
     reducers: {
         reset: () => initialState
     },
     extraReducers: builder => {
-        builder.addCase(fetchRegister.pending, state => {
+        builder.addCase(fetchActivate.pending, state => {
             state.isLoading = true
             state.response = null
             state.error = null
         })
 
-        builder.addCase(fetchRegister.fulfilled, (state, action: PayloadAction<IRegisterResponse>) => {
+        builder.addCase(fetchActivate.fulfilled, (state, action: PayloadAction<IRegisterResponse>) => {
             state.isLoading = false
             state.response = action.payload
             state.error = null
         })
 
-        builder.addCase(fetchRegister.rejected, (state, action) => {
+        builder.addCase(fetchActivate.rejected, (state, action) => {
             state.isLoading = false
             state.response = null
             state.error = action.payload
@@ -52,7 +52,7 @@ const authRegisterSlice = createSlice({
     }
 })
 
-export default authRegisterSlice.reducer
+export default authActivateSlice.reducer
 export const {
     reset
-} = authRegisterSlice.actions
+} = authActivateSlice.actions

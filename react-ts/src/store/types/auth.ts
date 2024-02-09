@@ -20,3 +20,7 @@ export interface ILoginResponse {
 export interface IRegisterResponse {
     message: string
 }
+
+export type IActivateParamsType = {
+    token: string
+}

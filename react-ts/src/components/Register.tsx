@@ -3,12 +3,10 @@ import App from "./App"
 import { useAppDispatch, useAppSelector } from '../store'
 import {IState} from "../store/types/global"
 import {IRegisterResponse} from "../store/types/auth"
-import {NavigateFunction, useNavigate } from 'react-router-dom'
 import {fetchRegister} from "../store/features/auth/registerSlice"
 
 function Login(): React.JSX.Element {
     const dispatch = useAppDispatch()
-    const navigate: NavigateFunction = useNavigate()
     const registerSlice: IState<IRegisterResponse> = useAppSelector(state => state.register)
     const [email, setEmail] = useState<string>("anil2@senocak.com")
     const [name, setName] = useState<string>("Anıl")
@@ -18,7 +16,7 @@ function Login(): React.JSX.Element {
         if (!registerSlice.isLoading && registerSlice.response !== null) {
             console.log(registerSlice.response)
         }
-    }, [registerSlice, dispatch, navigate])
+    }, [registerSlice, dispatch])
     return <>
         <App/>
         <br/>
@@ -43,7 +41,7 @@ function Login(): React.JSX.Element {
                 <div style={{color: "green"}}>Response:</div>{JSON.stringify(registerSlice.response)}
             </>
         }
+
     </>
 }
-
 export default Login

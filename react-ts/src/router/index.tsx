@@ -12,6 +12,7 @@ import Users from "../components/admin/Users"
 import Forbidden from "../components/Forbidden"
 import NotFound from "../components/NotFound"
 import Register from "../components/Register";
+import Activate from "../components/Activate";
 
 export type RouteItemType = {
     path: string
@@ -39,6 +40,10 @@ export const routes: Array<RouteItemType> = [
             {
                 path: '/register',
                 component: Register
+            },
+            {
+                path: '/activate/:token',
+                component: Activate
             }
         ]
     },
