@@ -1,13 +1,63 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react'
-import { Router, Route, Routes } from 'react-router-dom'
-import ProtectedRoute from './ProtectedRoute'
-import PublicRoute from './PublicRoute'
-import {RouteItemType, routes} from '../config/routes'
+import {Router, Route, Routes, Navigate} from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../store'
 import { history } from '../utils/history'
-import {fetchMe} from "../store/features/auth/meSlice";
-import {Role, UserResponse} from '../store/types/user'
-import {IState} from "../store/types/global";
+import {fetchMe} from "../store/features/auth/meSlice"
+import {Role, User} from '../store/types/user'
+import {IState} from "../store/types/global"
+import App from "../components/App"
+import Login from "../components/Login"
+import AdminHome from "../components/admin/AdminHome"
+import Users from "../components/admin/Users"
+import Forbidden from "../components/Forbidden"
+import NotFound from "../components/NotFound"
+
+export type RouteItemType = {
+    path: string
+    component?: React.ComponentType<any>
+    authRequired?: boolean
+    routes?: Array<RouteItemType>
+    role?: Role[]
+}
+
+export const routes: Array<RouteItemType> = [
+    {
+        path: '/',
+        component: App,
+        authRequired: false,
+    },
+    {
+        path: '/login',
+        authRequired: false,
+        component: Login
+    },
+    {
+        path: '/admin',
+        authRequired: true,
+        component: AdminHome,
+        role: [
+            {name: 'ADMIN'}
+        ],
+        routes: [
+            {
+                path: '/users',
+                component: Users,
+                // authRequired: false, // TODO: this should work
+                role: [
+                    {name: 'ADMIN'}
+                ]
+            }
+        ]
+    },
+    {
+        path: '/forbidden',
+        component: Forbidden
+    },
+    {
+        path: '*',
+        component: NotFound
+    }
+]
 
 /**
  * Converts the router tree to a flat list.
@@ -19,11 +69,12 @@ export const getFlatRoutes = (routes: Array<RouteItemType>) => {
         if (items.length > 0) {
             items.forEach((item: RouteItemType): void => {
                 const nestedPath: string = ((path ? path : '') + item.path).replace(/\/\/+/g, '/')
+
                 if (item.component !== undefined) {
                     _routes.push({
                         path: nestedPath,
                         component: item.component,
-                        authRequired: authRequired,
+                        authRequired: item.authRequired ? item.authRequired : authRequired,
                         role: item.role ? item.role : role
                     })
                 }
@@ -31,7 +82,7 @@ export const getFlatRoutes = (routes: Array<RouteItemType>) => {
                     worker(
                         item.routes,
                         nestedPath,
-                        item.authRequired ? item.authRequired : authRequired,
+                        item.authRequired,
                         item.role ? item.role : role
                     )
                 }
@@ -50,7 +101,7 @@ export const AppRouter = () => {
     const dispatch = useAppDispatch()
     const [state, setState] = useState({ action: history.action, location: history.location })
     const [routeItems, setRouteItems] = useState<Array<RouteItemType>>([])
-    const me: IState<UserResponse> = useAppSelector(state => state.me)
+    const me: IState<User> = useAppSelector(state => state.me)
 
     useLayoutEffect(() => history.listen(setState), [])
     useEffect((): void => {
@@ -69,30 +120,26 @@ export const AppRouter = () => {
                 <Router navigator={ history } location={ state.location } navigationType={ state.action }>
                     <Routes>
                         {
-                            routeItems.map((route: RouteItemType, key: number): null | React.JSX.Element => {
+                            routeItems.map((route: RouteItemType, key: number): null |React.JSX.Element => {
                                 if (route.component === undefined)
                                     return null
                                 if (route.authRequired !== undefined) {
-                                    if (route.authRequired)
-                                        return <Route path={route.path}
-                                                      element={
-                                                        <ProtectedRoute
-                                                            isAuthenticated={me.response !== null}
-                                                            isAuthorized={
-                                                                me.response !== null &&
-                                                                route.role !== undefined &&
-                                                                route.role.some((allowedRole: Role) => me.response!!.user.roles.some((role: Role): boolean => role.name === allowedRole.name))
-                                                            }
-                                                            element={<route.component/>}/>
-                                                      }
-                                                      key={key}/>
-                                    return <Route path={ route.path }
-                                                  element={
-                                                    <PublicRoute
-                                                        //TODO: isAuthenticated={ me.response !== null }
-                                                        element={ <route.component/> }/>
-                                                  }
-                                                  key={ key }/>
+                                    const isAuthenticated: boolean = me.response !== null
+                                    const isAuthorized: boolean = isAuthenticated &&
+                                        route.role !== undefined &&
+                                        route.role.some((allowedRole: Role) => me.response!!.roles.some((role: Role): boolean => role.name === allowedRole.name))
+
+                                    if (route.authRequired) {
+                                        if (isAuthenticated && isAuthorized)
+                                            return <Route path={route.path} element={ <route.component/>} key={ key }/>
+                                        if (!isAuthorized)
+                                            return <Route path={route.path} element={ <Navigate to={{pathname: '/forbidden'}}/> } key={ key }/>
+                                        return <Route path={route.path} element={ <Navigate to={{pathname: '/login'}}/> } key={ key }/>
+                                    }
+
+                                    if (!isAuthenticated)
+                                        return <Route path={route.path} element={ <route.component/>} key={ key }/>
+                                    return <Route path={route.path} element={ <Navigate to={{pathname: '/'}}/> } key={ key }/>
                                 }
                                 return <Route path={ route.path } element={ <route.component/> } key={ key }/>
                             })

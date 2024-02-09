@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import UserApiClient from '../../../utils/http-client/UserApiClient'
 import { IState } from '../../types/global'
-import {UserResponse} from '../../types/user'
+import {User} from '../../types/user'
 
 const userApiClient: UserApiClient = UserApiClient.getInstance()
 
@@ -19,7 +19,7 @@ export const fetchMe = createAsyncThunk('user/fetchMe',
         }
     })
 
-const initialState: IState<UserResponse> = {
+const initialState: IState<User> = {
     isLoading: false,
     response: null,
     error: null
@@ -38,7 +38,7 @@ const meSlice = createSlice({
             state.error = null
         })
 
-        builder.addCase(fetchMe.fulfilled, (state, action: PayloadAction<UserResponse>) => {
+        builder.addCase(fetchMe.fulfilled, (state, action: PayloadAction<User>) => {
             state.isLoading = false
             state.response = action.payload
             state.error = null
