@@ -11,6 +11,7 @@ import patchCommentVisibilitySlice from "./features/post/patchCommentVisibilityS
 import registerSlice from "./features/auth/registerSlice"
 import activateSlice from "./features/auth/activateSlice"
 import resendEmailActivationSlice from "./features/auth/resendEmailActivationSlice"
+import logoutSlice from "./features/auth/logoutSlice"
 
 export default combineReducers({
     me: meSlice,
@@ -18,6 +19,7 @@ export default combineReducers({
     register: registerSlice,
     activate: activateSlice,
     resendEmailActivation: resendEmailActivationSlice,
+    logout: logoutSlice,
 
     addComment: addCommentSlice,
 

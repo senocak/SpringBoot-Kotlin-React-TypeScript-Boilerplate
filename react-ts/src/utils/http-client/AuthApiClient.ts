@@ -67,6 +67,9 @@ export default class AuthApiClient extends AbstractHttpClient {
     public resendEmailActivation = async (email: string) =>
         await this.instance.post(`/auth/resend-email-activation/${email}`)
 
+    public logout = async () =>
+        await this.instance.post(`/auth/logout`)
+
     /**
      * Refresh token.
      */
