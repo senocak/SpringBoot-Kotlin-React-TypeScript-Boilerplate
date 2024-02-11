@@ -10,12 +10,14 @@ import patchPostSlice from "./features/post/patchPostSlice"
 import patchCommentVisibilitySlice from "./features/post/patchCommentVisibilitySlice"
 import registerSlice from "./features/auth/registerSlice"
 import activateSlice from "./features/auth/activateSlice"
+import resendEmailActivationSlice from "./features/auth/resendEmailActivationSlice"
 
 export default combineReducers({
     me: meSlice,
     login: loginSlice,
     register: registerSlice,
     activate: activateSlice,
+    resendEmailActivation: resendEmailActivationSlice,
 
     addComment: addCommentSlice,
 

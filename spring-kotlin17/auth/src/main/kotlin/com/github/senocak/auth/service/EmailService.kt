@@ -28,6 +28,7 @@ class EmailService(
     private val log: Logger by logger()
     @Value("\${spring.application.name}") private lateinit var appName: String
     @Value("\${server.port}") private lateinit var port: String
+    @Value("\${app.frontend-url}") private lateinit var frontendUrl: String
 
     /**
      * Send an e-mail to the specified address.
@@ -59,7 +60,7 @@ class EmailService(
                 .also { it: Context ->
                     it.setVariable("name", user.name)
                     it.setVariable("email", user.email)
-                    it.setVariable("url", "localhost:${port.toLong()}/api/v1/auth/activate-email/${emailActivationToken.token}")
+                    it.setVariable("url", "${frontendUrl}/auth/activate-email/${emailActivationToken.token}")
                     it.setVariable("token", emailActivationToken.token)
                 }
             send(to = InternetAddress(user.email, user.name), subject = messageSourceService.get(code = "email_activation"),
@@ -82,7 +83,7 @@ class EmailService(
                 .also { it: Context ->
                     it.setVariable("name", user.name)
                     it.setVariable("email", user.email)
-                    it.setVariable("url", "localhost:${port.toLong()}/api/v1/auth/change-password/${token}")
+                    it.setVariable("url", "${frontendUrl}/auth/change-password/${token}")
                     it.setVariable("token", token)
                 }
             send(to = InternetAddress(user.email, user.name), subject = messageSourceService.get(code = "password_change"),

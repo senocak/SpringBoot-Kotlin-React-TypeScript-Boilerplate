@@ -11,8 +11,8 @@ import AdminHome from "../components/admin/AdminHome"
 import Users from "../components/admin/Users"
 import Forbidden from "../components/Forbidden"
 import NotFound from "../components/NotFound"
-import Register from "../components/Register";
-import Activate from "../components/Activate";
+import Register from "../components/Register"
+import Activate from "../components/Activate"
 
 export type RouteItemType = {
     path: string
@@ -42,7 +42,7 @@ export const routes: Array<RouteItemType> = [
                 component: Register
             },
             {
-                path: '/activate/:token',
+                path: '/activate-email/:token',
                 component: Activate
             }
         ]

@@ -28,8 +28,7 @@ function Login(): React.JSX.Element {
                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)}/>
         <button disabled={registerSlice.isLoading} onClick={(): void => {
             dispatch(fetchRegister({name: name, email: email, password: password}))
-        }}>Gönder
-        </button>
+        }}>Gönder</button>
         {registerSlice.isLoading && <p>Bekleyin...</p>}
         {registerSlice.error !== null &&
             <>

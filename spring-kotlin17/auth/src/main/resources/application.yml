@@ -64,6 +64,7 @@ app:
   jwtExpirationInMs: '#{60 * 50 * 1000}' # 50 minutes in milliseconds
   refreshExpirationInMs: '#{24 * 60 * 60 * 1000}' # 24 hours in milliseconds
   default-locale: en
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:3232}
   mail:
     host: ${MAIL_HOST:smtp.yandex.com.tr}
     port: 587
