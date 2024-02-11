@@ -19,7 +19,6 @@ function Login(): React.JSX.Element {
     }, [registerSlice, dispatch])
     return <>
         <App/>
-        <br/>
         <input type="text" placeholder="isim" required autoFocus disabled={registerSlice.isLoading} value={name}
                onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setName(event.target.value)}/>
         <input type="text" placeholder="Email" required autoFocus disabled={registerSlice.isLoading} value={email}

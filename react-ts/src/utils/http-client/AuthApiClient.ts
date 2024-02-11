@@ -2,7 +2,7 @@ import { AxiosError } from 'axios'
 import AbstractHttpClient from './AbstractHttpClient'
 import history from '../history'
 import app from "../../config/app"
-import {ILoginParams, IRegisterParams} from "../../store/types/auth"
+import {IChangePasswordRequest, ILoginParams, IRegisterParams} from "../../store/types/auth"
 
 export default class AuthApiClient extends AbstractHttpClient {
     /**
@@ -69,6 +69,12 @@ export default class AuthApiClient extends AbstractHttpClient {
 
     public logout = async () =>
         await this.instance.post(`/auth/logout`)
+
+    public resetPassword = async (email: string) =>
+        await this.instance.post(`/auth/reset-password/${email}`)
+
+    public changePassword = async (params: IChangePasswordRequest, token: string) =>
+        await this.instance.post(`/auth/change-password/${token}`, params)
 
     /**
      * Refresh token.

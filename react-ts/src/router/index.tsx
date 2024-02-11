@@ -13,6 +13,7 @@ import Forbidden from "../components/Forbidden"
 import NotFound from "../components/NotFound"
 import Register from "../components/Register"
 import Activate from "../components/Activate"
+import ChangePassword from "../components/ChangePassword"
 
 export type RouteItemType = {
     path: string
@@ -44,6 +45,10 @@ export const routes: Array<RouteItemType> = [
             {
                 path: '/activate-email/:token',
                 component: Activate
+            },
+            {
+                path: '/change-password/:token',
+                component: ChangePassword
             }
         ]
     },
@@ -155,7 +160,9 @@ export const AppRouter = () => {
 
                                     if (!isAuthenticated)
                                         return <Route path={route.path} element={ <route.component/>} key={ key }/>
-                                    return <Route path={route.path} element={ <Navigate to={{pathname: '/'}}/> } key={ key }/>
+                                    //if (route.path == "/auth/change-password/:token")
+                                    //    console.log(route)
+                                    //return <Route path={route.path} element={ <Navigate to={{pathname: '/'}}/> } key={ key }/>
                                 }
                                 return <Route path={ route.path } element={ <route.component/> } key={ key }/>
                             })

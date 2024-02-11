@@ -24,3 +24,9 @@ export interface IRegisterResponse {
 export type IActivateParamsType = {
     token: string
 }
+
+export interface IChangePasswordRequest {
+    email: string
+    password: string
+    password_confirmation: string
+}

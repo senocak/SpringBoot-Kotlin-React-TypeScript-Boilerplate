@@ -1,49 +1,49 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import AuthApiClient from '../../../utils/http-client/AuthApiClient'
+import {IRegisterResponse} from "../../types/auth"
 import { IState } from '../../types/global'
 
 const authApiClient: AuthApiClient = AuthApiClient.getInstance()
 
-export const fetchLogout = createAsyncThunk('auth/fetchLogout',
-                                        async (_: void, { rejectWithValue }) => {
+export const fetchResetPassword = createAsyncThunk('auth/fetchResetPassword',
+                                        async (email: string, { rejectWithValue }) => {
     try {
-        const { data } = await authApiClient.logout()
+        const { data } = await authApiClient.resetPassword(email)
         return data
     } catch (error: any) {
         if (!error.response) {
             throw error
         }
-
         return rejectWithValue(error)
     }
 })
 
-const initialState: IState<string> = {
+const initialState: IState<IRegisterResponse> = {
     isLoading: false,
     response: null,
     error: null
 }
 
-const authLogoutSlice = createSlice({
-    name: 'auth/register',
+const authResetPasswordSlice = createSlice({
+    name: 'auth/resendEmailActivation',
     initialState,
     reducers: {
-        resetLogout: () => initialState
+        reset: () => initialState
     },
     extraReducers: builder => {
-        builder.addCase(fetchLogout.pending, state => {
+        builder.addCase(fetchResetPassword.pending, state => {
             state.isLoading = true
             state.response = null
             state.error = null
         })
 
-        builder.addCase(fetchLogout.fulfilled, (state, action: PayloadAction<string>) => {
+        builder.addCase(fetchResetPassword.fulfilled, (state, action: PayloadAction<IRegisterResponse>) => {
             state.isLoading = false
-            state.response = "nocontent"
+            state.response = action.payload
             state.error = null
         })
 
-        builder.addCase(fetchLogout.rejected, (state, action) => {
+        builder.addCase(fetchResetPassword.rejected, (state, action) => {
             state.isLoading = false
             state.response = null
             state.error = action.payload
@@ -51,7 +51,7 @@ const authLogoutSlice = createSlice({
     }
 })
 
-export default authLogoutSlice.reducer
+export default authResetPasswordSlice.reducer
 export const {
-    resetLogout
-} = authLogoutSlice.actions
+    reset
+} = authResetPasswordSlice.actions
