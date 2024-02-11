@@ -14,7 +14,7 @@ function Login(): React.JSX.Element {
     const loginSlice: IState<ILoginResponse> = useAppSelector(state => state.login)
     const resendEmailActivationSlice: IState<IRegisterResponse> = useAppSelector(state => state.resendEmailActivation)
     const [email, setEmail] = useState<string>("anil2@senocak.com")
-    const [password, setPassword] = useState<string>("asenocak")
+    const [password, setPassword] = useState<string>("louie.Stehr1")
     const [error, setError] = useState<string>("")
 
     useEffect((): void => {
