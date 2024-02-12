@@ -52,6 +52,10 @@ docker compose up -d
 
 - [You can access the Postman collection here](https://github.com/senocak/SpringBoot-Kotlin-React-TypeScript-Boilerplate/blob/main/spring-kotlin17/auth/src/main/resources/static/kotlin%20spring%20boilerplate.postman_collection.json)
 
+### SS
+
+<img src="ss.png" alt="ss.png">
+
 ### License
 
 Apache License 2.0
