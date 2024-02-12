@@ -23,6 +23,7 @@ function App(): React.JSX.Element {
     const [isAuthorized, setIsAuthorized] = useState<boolean>(false)
     const [error, setError] = useState<string>("")
 
+    const [online, setOnline] = useState<string[]>([])
     const [wsConnection, setWsConnection] = useState<WebSocket |null>(null)
     const [notification, setNotification] = useState({show: false, color: "green", msg: ""})
 
@@ -34,14 +35,24 @@ function App(): React.JSX.Element {
             ws.onopen = (): void => {
                 setWsConnection(ws)
                 setNotification({show: true, color: 'green', msg: `Websocket bağlandı`})
-                console.log("asd")
                 setTimeout((): void => {
                     setNotification({show: false, color: '', msg: ''})
                 }, 1_000)
             }
             ws.onmessage = (event: IMessageEvent): void => {
                 const parse: WsRequestBody = JSON.parse(event.data.toString())
-                console.log("parse", parse)
+                console.log("parse:"+parse)
+                if (parse.type === WsType.Online) {
+                    setOnline(parse.content!.split(","))
+                }else if (parse.type === WsType.Login) {
+                    if (!online.includes(parse.content!)) {
+                        setOnline((prevArray: string[]) => [...prevArray, parse.content!]);
+                    }
+                }else if (parse.type === WsType.Logout) {
+                    if (!online.includes(parse.content!)) {
+                        setOnline((prevArray: string[]) => prevArray.filter((item: string) => item !== parse.content!));
+                    }
+                }
             }
             return
         }
@@ -93,6 +104,7 @@ function App(): React.JSX.Element {
                     <p>{JSON.stringify(resetPasswordSlice.response)}</p>}
 
                 {(error !== null && error !== "") && <p>{JSON.stringify(error)}</p>}
+                <p>Online: {JSON.stringify(online)}</p>
             </>
         }
 
