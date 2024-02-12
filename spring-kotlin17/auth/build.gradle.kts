@@ -45,7 +45,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-	runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
+	//runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -70,4 +70,33 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	maxHeapSize = "1G"
+}
+
+tasks.withType<Test> {
+	val testType: String = "unit"
+		.takeUnless { project.hasProperty("profile") }
+		?: "${project.property("profile")}"
+	println("Profile test type: $testType")
+	when (testType) {
+		"integration" -> {
+			include("**/*IT.*")
+		}
+		"unit" -> {
+			include("**/*Test.*")
+			exclude("**/*IT.*")
+		}
+		else -> {
+			// Default to unit
+			include("**/*Test.*")
+			include("**/*IT.*")
+		}
+	}
+}
+
+// Integration test task (assuming it's named integrationTest)
+tasks.register<Test>("integrationTest") {
+	description = "Runs the integration tests"
+	group = "Verification"
+	include("**/*IT.*")
 }

@@ -42,7 +42,7 @@ import org.springframework.web.context.WebApplicationContext
  */
 @SpringBootTestConfig
 @DisplayName("Integration Tests for UserController")
-class UserControllerTest {
+class UserControllerIT {
     @Autowired private lateinit var objectMapper: ObjectMapper
 
     private lateinit var mockMvc: MockMvc

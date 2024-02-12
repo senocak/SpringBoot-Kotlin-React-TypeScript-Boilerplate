@@ -52,7 +52,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
  */
 @SpringBootTestConfig
 @DisplayName("Integration Tests for AuthController")
-class AuthControllerTest {
+class AuthControllerIT {
     @Autowired private lateinit var authController: AuthController
     @Autowired private lateinit var objectMapper: ObjectMapper
     @Autowired private lateinit var userService: UserService
@@ -520,7 +520,7 @@ class AuthControllerTest {
         fun givenAlreadyResettedPassword_whenResetPassword_thenThrowServerException() {
             // Given
             val email = "anilnotactivated@senocak.com"
-            val passwordResetToken: PasswordResetToken = PasswordResetToken(
+            PasswordResetToken(
                 token = 10.randomStringGenerator(),
                 userId = UUID.fromString("4cb9374e-4e52-4142-a1af-16144ef4a27d")
             )
@@ -770,7 +770,7 @@ class AuthControllerTest {
         fun given_whenChangePassword_thenReturn200() {
             // Given
             val loginRequest = LoginRequest(email = USER_EMAIL, password = USER_PASSWORD)
-            val loginResponse: UserWrapperResponse = login(loginRequest = loginRequest)
+            login(loginRequest = loginRequest)
                 .run { this.andReturn().response.contentAsString }
                 .run { objectMapper.readValue(this, UserWrapperResponse::class.java) }
 
