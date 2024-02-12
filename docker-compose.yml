@@ -3,7 +3,7 @@ version: '3.7'
 services:
   postgres:
     image: postgres:14
-    container_name: boilerplate-postgres
+    container_name: postgres-boilerplate
     restart: always
     environment:
       POSTGRES_DB: boilerplate
@@ -14,14 +14,14 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./var/logs/postgresql:/var/log/postgresql
     ports:
-      - "5433:5432"
+      - "5432:5432"
     healthcheck:
       test: "pg_isready -U postgres"
     networks:
       - boilerplate
   redis:
     image: redis:7.0.5-alpine
-    container_name: boilerplate-redis
+    container_name: redis-boilerplate
     restart: always
     command: redis-server --save 20 1 --loglevel warning --requirepass senocak
     volumes:
@@ -37,19 +37,28 @@ services:
     container_name: boilerplate-spring-kotlin
     ports:
       - "8080:8080"
-    restart: always
+    restart: no
     environment:
       SERVER_PORT: 8080
-      SERVER_IP: localhost
-      POSTGRESQL_PORT: 5433
+      SERVER_IP: postgres
+      POSTGRESQL_PORT: 5432
       POSTGRESQL_DB: boilerplate
       POSTGRESQL_SCHEMA: public
       POSTGRESQL_USER: postgres
       POSTGRESQL_PASSWORD: senocak
-      REDIS_HOST: localhost
+
+      REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: senocak
       REDIS_TIMEOUT: 300
+
+      MAIL_HOST: smtp.yandex.com.tr
+      MAIL_PROTOCOL: smtp
+      MAIL_USERNAME: notification@cosmosboard.com
+      MAIL_PASSWORD: xsqgbadvvwxasyoq
+
+      APP_FRONTEND_URL: http://localhost:3232
+
     networks:
       - boilerplate
     depends_on:
@@ -70,11 +79,4 @@ networks:
   boilerplate:
 volumes:
   db-data:
-  rabbitmq-data:
   redis-data:
-  pgadmin-data:
-  nginx-proxy-manager-data:
-  letsencrypt-data:
-  mysql-data:
-  consul-data:
-  minio_storage: {}
