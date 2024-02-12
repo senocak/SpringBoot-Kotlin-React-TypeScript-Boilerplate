@@ -1,24 +1,24 @@
 version: '3.7'
 
 services:
-  postgres:
-    image: postgres:14
-    container_name: boilerplate-postgres
-    restart: always
-    environment:
-      POSTGRES_DB: boilerplate
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: senocak
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - db-data:/var/lib/postgresql/data
-      - ./var/logs/postgresql:/var/log/postgresql
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: "pg_isready -U postgres"
-    networks:
-      - boilerplate
+  #postgres:
+  #  image: postgres:14
+  #  container_name: boilerplate-postgres
+  #  restart: always
+  #  environment:
+  #    POSTGRES_DB: boilerplate
+  #    POSTGRES_USER: postgres
+  #    POSTGRES_PASSWORD: senocak
+  #    PGDATA: /var/lib/postgresql/data/pgdata
+  #  volumes:
+  #    - db-data:/var/lib/postgresql/data
+  #    - ./var/logs/postgresql:/var/log/postgresql
+  #  ports:
+  #    - "5432:5432"
+  #  healthcheck:
+  #    test: "pg_isready -U postgres"
+  #  networks:
+  #    - boilerplate
   redis:
     image: redis:7.0.5-alpine
     container_name: boilerplate-redis
@@ -30,31 +30,41 @@ services:
       - "6379:6379"
     networks:
       - boilerplate
-  backend:
-    build:
-      context: ./spring-kotlin17/auth
-      dockerfile: Dockerfile
-    container_name: boilerplate-spring-kotlin
-    ports:
-      - "8080:8080"
-    restart: always
-    environment:
-      SERVER_PORT: 8080
-    networks:
-      - boilerplate
-    depends_on:
-      - postgres
-      - redis
-  frontend:
-    build:
-      context: ./react-ts
-      dockerfile: Dockerfile
-    container_name: boilerplate-react-typescript
-    ports:
-      - "3232:3232"
-    depends_on:
-      - backend
-    networks:
-      - boilerplate
+  #backend:
+  #  build:
+  #    context: ./spring-kotlin17/auth
+  #    dockerfile: Dockerfile
+  #  container_name: boilerplate-spring-kotlin
+  #  ports:
+  #    - "8080:8080"
+  #  restart: always
+  #  environment:
+  #    SERVER_PORT: 8080
+  #  networks:
+  #    - boilerplate
+  #  depends_on:
+  #   # - postgres
+  #    - redis
+  #frontend:
+  #  build:
+  #    context: ./react-ts
+  #    dockerfile: Dockerfile
+  #  container_name: boilerplate-react-typescript
+  #  ports:
+  #    - "3232:3232"
+  #  depends_on:
+  #    - backend
+  #  networks:
+  #    - boilerplate
 networks:
   boilerplate:
+volumes:
+  db-data:
+  rabbitmq-data:
+  redis-data:
+  pgadmin-data:
+  nginx-proxy-manager-data:
+  letsencrypt-data:
+  mysql-data:
+  consul-data:
+  minio_storage: {}
