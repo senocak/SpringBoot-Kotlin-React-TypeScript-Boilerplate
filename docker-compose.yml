@@ -64,17 +64,17 @@ services:
     depends_on:
       - postgres
       - redis
-  #frontend:
-  #  build:
-  #    context: ./react-ts
-  #    dockerfile: Dockerfile
-  #  container_name: boilerplate-react-typescript
-  #  ports:
-  #    - "3232:3232"
-  #  depends_on:
-  #    - backend
-  #  networks:
-  #    - boilerplate
+  frontend:
+    build:
+      context: ./react-ts
+      dockerfile: Dockerfile
+    container_name: boilerplate-react-typescript
+    ports:
+      - "3232:3232"
+    depends_on:
+      - backend
+    networks:
+      - boilerplate
 networks:
   boilerplate:
 volumes:

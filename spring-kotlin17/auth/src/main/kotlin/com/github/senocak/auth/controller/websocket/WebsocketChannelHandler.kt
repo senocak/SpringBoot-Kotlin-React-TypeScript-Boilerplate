@@ -7,8 +7,8 @@ import com.github.senocak.auth.exception.ServerException
 import com.github.senocak.auth.security.JwtTokenProvider
 import com.github.senocak.auth.service.WebSocketCacheService
 import com.github.senocak.auth.util.OmaErrorMessageType
+import com.github.senocak.auth.util.getQueryParams
 import com.github.senocak.auth.util.logger
-import com.github.senocak.auth.util.split
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import org.slf4j.Logger
@@ -95,32 +95,8 @@ class WebsocketChannelHandler(
         }
     }
 
-    /**
-     * Parses the query string into a map of key/value pairs.
-     * @param queryParamString The query string to parse.
-     * @return A map of key/value pairs.
-     */
-    private fun getQueryParams(queryParamString: String?): Map<String, String>? {
-        val queryParams: MutableMap<String, String> = LinkedHashMap()
-        return when {
-            !queryParamString.isNullOrEmpty() -> null
-            else -> {
-                val split: Array<String>? = queryParamString!!.split(delimiter = "&")
-                if (!split.isNullOrEmpty())
-                    for (param: String in split) {
-                        val paramArray: Array<String>? = param.split(delimiter = "=")
-                        queryParams[paramArray!![0]] = paramArray[1]
-                    } else {
-                    val paramArray: Array<String>? = queryParamString.split(delimiter = "=")
-                    queryParams[paramArray!![0]] = paramArray[1]
-                }
-                queryParams
-            }
-        }
-    }
-
     private fun getUserEmailAndAccessTokenFromQueryParams(query: String): Pair<String, String>  {
-        val queryParams: Map<String, String> = getQueryParams(queryParamString = query) ?: throw Exception("QueryParams can not be empty")
+        val queryParams: Map<String, String> = query.getQueryParams() ?: throw Exception("QueryParams can not be empty")
         val accessToken: String = queryParams["access_token"] ?: throw Exception("Auth can not be empty")
         return Pair(first = jwtTokenProvider.getUserEmailFromJWT(token = accessToken), second = accessToken)
     }

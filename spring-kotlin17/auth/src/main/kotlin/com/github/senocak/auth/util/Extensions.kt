@@ -72,3 +72,26 @@ fun Logger.changeLevel(loglevel: String) {
  * @return The array of two strings.
  */
 fun String.split(delimiter: String): Array<String>? = StringUtils.split(this, delimiter)
+
+/**
+ * Parses the query string into a map of key/value pairs.
+ * @return A map of key/value pairs.
+ */
+fun String.getQueryParams(): Map<String, String>? {
+    val queryParams: MutableMap<String, String> = LinkedHashMap()
+    return when {
+        this.isEmpty() -> null
+        else -> {
+            val split: Array<String>? = this.split(delimiter = "&")
+            if (!split.isNullOrEmpty())
+                for (param: String in split) {
+                    val paramArray: Array<String>? = param.split(delimiter = "=")
+                    queryParams[paramArray!![0]] = paramArray[1]
+                } else {
+                val paramArray: Array<String>? = this.split(delimiter = "=")
+                queryParams[paramArray!![0]] = paramArray[1]
+            }
+            queryParams
+        }
+    }
+}

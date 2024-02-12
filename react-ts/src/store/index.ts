@@ -11,7 +11,7 @@ const logger = createLogger({
 
 const store = configureStore({
     reducer,
-    middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false }).concat(logger),
+    middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false }).concat(logger as any),
     devTools: true,
     enhancers: [reduxBatch]
 })

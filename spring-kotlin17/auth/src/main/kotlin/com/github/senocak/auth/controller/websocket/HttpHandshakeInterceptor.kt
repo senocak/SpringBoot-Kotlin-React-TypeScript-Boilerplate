@@ -3,10 +3,9 @@ package com.github.senocak.auth.controller.websocket
 import com.github.senocak.auth.domain.dto.WebsocketIdentifier
 import com.github.senocak.auth.security.JwtTokenProvider
 import com.github.senocak.auth.service.WebSocketCacheService
+import com.github.senocak.auth.util.getQueryParams
 import com.github.senocak.auth.util.logger
-import com.github.senocak.auth.util.split
 import java.net.URI
-import java.util.UUID
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import org.slf4j.Logger
@@ -51,7 +50,7 @@ class HttpHandshakeInterceptor(
                 if (allWebSocketSession.containsKey(key = userId))
                     return false.also { log.warn("User already exists in the websocket session cache; rejecting websocket connection attempt!") }
             }.onFailure {
-                log.warn("Token is invalid for this user; rejecting websocket connection attempt! ${it.message}")
+                log.warn("Rejecting websocket connection attempt! ${it.message}")
                     .run { return false }
             }
             return true
@@ -70,32 +69,8 @@ class HttpHandshakeInterceptor(
         log.info("[HttpHandshakeInterceptor:afterHandshake] request: $request, response: $response, wsHandler: $wsHandler, ex: $ex")
     }
 
-    /**
-     * Parses the query string into a map of key/value pairs.
-     * @param queryParamString The query string to parse.
-     * @return A map of key/value pairs.
-     */
-    private fun getQueryParams(queryParamString: String?): Map<String, String>? {
-        val queryParams: MutableMap<String, String> = LinkedHashMap()
-        return when {
-            !queryParamString.isNullOrEmpty() -> null
-            else -> {
-                val split: Array<String>? = queryParamString!!.split(delimiter = "&")
-                if (!split.isNullOrEmpty())
-                    for (param: String in split) {
-                        val paramArray: Array<String>? = param.split(delimiter = "=")
-                        queryParams[paramArray!![0]] = paramArray[1]
-                    } else {
-                    val paramArray: Array<String>? = queryParamString.split(delimiter = "=")
-                    queryParams[paramArray!![0]] = paramArray[1]
-                }
-                queryParams
-            }
-        }
-    }
-
     private fun getAccessTokenFromQueryParams(query: String): Pair<String, String>  {
-        val queryParams: Map<String, String> = getQueryParams(queryParamString = query) ?: throw Exception("QueryParams can not be empty")
+        val queryParams: Map<String, String> = query.getQueryParams() ?: throw Exception("QueryParams can not be empty")
         val accessToken: String = queryParams["access_token"] ?: throw Exception("Auth can not be empty")
         return Pair(first = jwtTokenProvider.getUserEmailFromJWT(token = accessToken), second = accessToken)
     }
