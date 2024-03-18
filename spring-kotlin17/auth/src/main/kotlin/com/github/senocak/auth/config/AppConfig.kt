@@ -143,7 +143,7 @@ class AppConfig(
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
-    @Bean
+    //@Bean
     fun localeResolver(@Value("\${app.default-locale:en}") defaultLocale: String): LocaleResolver =
         SessionLocaleResolver()
             .also { it.setDefaultLocale(Locale.Builder().setLanguage(defaultLocale).build()) }

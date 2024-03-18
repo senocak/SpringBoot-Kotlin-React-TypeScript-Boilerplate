@@ -7,11 +7,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest
-import org.springframework.security.config.annotation.web.invoke
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
@@ -30,7 +32,20 @@ class WebSecurityConfig(
     @Bean
     fun securityFilterChainDSL(http: HttpSecurity): SecurityFilterChain =
         http {
-            cors {}
+            //cors {
+            //    configurationSource = UrlBasedCorsConfigurationSource()
+            //        .also { ubccs: UrlBasedCorsConfigurationSource ->
+            //            ubccs.registerCorsConfiguration("/**", CorsConfiguration()
+            //                .also {cc: CorsConfiguration ->
+            //                    cc.allowCredentials = true
+            //                    cc.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            //                    cc.allowedOrigins = listOf("https://example.com")
+            //                    cc.allowedHeaders = listOf("Authorization", "Origin", "Content-Type", "Accept")
+            //                    cc.exposedHeaders = listOf("Content-Type", "X-Rate-Limit-Retry-After-Seconds", "X-Rate-Limit-Remaining")
+            //                })
+            //        }
+            //}
+            //cors { Customizer.withDefaults<CorsConfiguration>() }
             csrf { disable() }
             exceptionHandling { authenticationEntryPoint = unauthorizedHandler }
             //httpBasic {}
@@ -43,10 +58,26 @@ class WebSecurityConfig(
                 authorize(pattern = "/api/v1/sse**/**", access = permitAll)
                 //authorize(matches = PathRequest.toH2Console(), access = permitAll)
                 authorize(matches = anyRequest, access = authenticated)
+                //authorize(matches = CorsUtils::isPreFlightRequest, access = permitAll)
             }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             headers { frameOptions { disable() } }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(filter = jwtAuthenticationFilter)
         }
         .run { http.build() }
+
+    //@Bean
+    fun corsConfigurationSource(): CorsConfigurationSource =
+        CorsConfiguration()
+            .also {
+                it.allowCredentials = true
+                it.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                it.allowedOrigins = listOf("https://example.com")
+                it.allowedHeaders = listOf("Authorization", "Origin", "Content-Type", "Accept")
+                it.exposedHeaders = listOf("Content-Type", "X-Rate-Limit-Retry-After-Seconds", "X-Rate-Limit-Remaining")
+            }
+            .run {
+                UrlBasedCorsConfigurationSource()
+                    .also { it.registerCorsConfiguration("/**", this) }
+            }
 }

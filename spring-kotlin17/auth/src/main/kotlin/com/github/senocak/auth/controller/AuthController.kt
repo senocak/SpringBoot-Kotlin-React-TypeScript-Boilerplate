@@ -22,6 +22,7 @@ import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.RoleName
 import com.github.senocak.auth.util.convertEntityToDto
 import com.github.senocak.auth.util.logger
+import io.micrometer.core.annotation.Counted
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -79,6 +80,7 @@ class AuthController(
             ApiResponse(responseCode = "500", description = "internal server error occurred",
                 content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
     ])
+    @Counted
     @Throws(ServerException::class)
     fun login(
         @Parameter(description = "Request body to login", required = true) @Validated @RequestBody loginRequest: LoginRequest,
