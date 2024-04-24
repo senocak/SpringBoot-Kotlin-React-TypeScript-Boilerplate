@@ -1,6 +1,9 @@
-spring-kotlin/target
-spring-kotlin/.idea
-
-.idea
-.vscode-
-/var/
+**/.idea
+**/.next
+**/.vscode
+**/.gradle
+**/node_modules
+**/build
+**/var
+**/.DS_Store
+**/*.log*
