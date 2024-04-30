@@ -19,13 +19,16 @@ class DataSourceConfig {
     @Primary
     fun dataSource(): DataSource =
         when {
-            url!!.contains("jdbc:postgresql") -> DriverManagerDataSource()
+            url!!.contains(other = "jdbc:postgresql") -> DriverManagerDataSource()
                 .also { db: DriverManagerDataSource ->
                     db.url = url
                     db.username = username
                     db.password = password
                     //db.setDriverClassName(dataSourceProperties.dbtype)
                 }
-            else -> throw RuntimeException("")
+            else -> throw RuntimeException("Not configured")
         }
+
+    override fun toString(): String =
+        "DataSourceConfig(url=$url, username=$username, password=$password, driverClassName=$driverClassName)"
 }

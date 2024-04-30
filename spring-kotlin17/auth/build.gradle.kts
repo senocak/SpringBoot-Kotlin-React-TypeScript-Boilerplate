@@ -17,6 +17,8 @@ java {
 repositories {
 	mavenCentral()
 }
+val jjwt = "0.11.5"
+val debezium = "2.7.0.Alpha1"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -35,9 +37,9 @@ dependencies {
 
 	implementation("com.google.guava:guava:33.0.0-jre")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
-	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-	implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+	implementation("io.jsonwebtoken:jjwt-api:$jjwt")
+	implementation("io.jsonwebtoken:jjwt-impl:$jjwt")
+	implementation("io.jsonwebtoken:jjwt-jackson:$jjwt")
 	implementation("org.flywaydb:flyway-core")
 	implementation("com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.9.0")
 	implementation("org.passay:passay:1.6.2")
@@ -47,6 +49,9 @@ dependencies {
 
 	runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("org.postgresql:postgresql")
+	implementation("io.debezium:debezium-api:$debezium")
+	implementation("io.debezium:debezium-embedded:$debezium")
+	implementation("io.debezium:debezium-connector-postgres:$debezium")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
