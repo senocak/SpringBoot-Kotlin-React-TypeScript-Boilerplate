@@ -10,18 +10,17 @@ import io.debezium.embedded.Connect
 import io.debezium.engine.DebeziumEngine
 import io.debezium.engine.RecordChangeEvent
 import io.debezium.engine.format.ChangeEventFormat
-import jakarta.annotation.PostConstruct
-import jakarta.annotation.PreDestroy
-import java.io.IOException
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import org.apache.kafka.connect.data.Struct
 import org.apache.kafka.connect.source.SourceRecord
 import org.slf4j.Logger
+import org.springframework.context.SmartLifecycle
 import org.springframework.stereotype.Service
 
 @Service
-class DebeziumListener(configuration: Configuration) {
+class DebeziumListener(configuration: Configuration): SmartLifecycle {
+    private var running: Boolean = false
     private val log: Logger by logger()
     private val executor: Executor = Executors.newSingleThreadExecutor()
     private lateinit var debeziumEngine: DebeziumEngine<RecordChangeEvent<SourceRecord>>
@@ -42,17 +41,14 @@ class DebeziumListener(configuration: Configuration) {
         val sourceRecordKey = sourceRecord.key() as Struct
         val sourceRecordValue = sourceRecord.value() as Struct
         val operation = Operation.forCode("${sourceRecordValue.get(OPERATION)}")
+        // ALTER TABLE public.mytable REPLICA IDENTITY FULL;
+        // https://stackoverflow.com/questions/59799503/postgres-debezium-does-not-publish-the-previous-state-of-a-record
         val before = sourceRecordValue.get(BEFORE)
         val after = sourceRecordValue.get(AFTER)
         log.info("sourceRecordKey:$sourceRecordKey, operation:$operation, before: $before, after: $after")
     }
 
-    @PostConstruct
-    private fun start() {
-        executor.execute(debeziumEngine)
-    }
-
-    @PreDestroy
-    @Throws(IOException::class)
-    private fun stop() = run { debeziumEngine.close() }
+    override fun start(): Unit = executor.execute(debeziumEngine).also { running = true }
+    override fun stop(): Unit = debeziumEngine.close().run { running = false }
+    override fun isRunning(): Boolean = running
 }
