@@ -1,5 +1,6 @@
 package com.github.senocak.auth.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.senocak.auth.domain.JwtToken
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.UserEmailActivationSendEvent
@@ -9,6 +10,7 @@ import com.github.senocak.auth.domain.dto.LoginRequest
 import com.github.senocak.auth.domain.dto.RefreshTokenRequest
 import com.github.senocak.auth.domain.dto.RegisterRequest
 import com.github.senocak.auth.domain.dto.RoleResponse
+import com.github.senocak.auth.domain.dto.ServiceData
 import com.github.senocak.auth.domain.dto.UserResponse
 import com.github.senocak.auth.domain.dto.UserWrapperResponse
 import com.github.senocak.auth.exception.ServerException
@@ -17,6 +19,7 @@ import com.github.senocak.auth.security.JwtTokenProvider
 import com.github.senocak.auth.service.MessageSourceService
 import com.github.senocak.auth.service.RoleService
 import com.github.senocak.auth.service.UserService
+import com.github.senocak.auth.util.Action
 import com.github.senocak.auth.util.AppConstants
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.RoleName
@@ -35,6 +38,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody as RequestBodySchema
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.constraints.Email
 import org.slf4j.Logger
+import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.HttpStatus
@@ -64,8 +68,11 @@ class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val eventPublisher: ApplicationEventPublisher,
     private val messageSourceService: MessageSourceService,
+    private val rabbitMessagingTemplate: RabbitMessagingTemplate,
     @Value("\${app.jwtExpirationInMs}") private val jwtExpirationInMs: Long,
-    @Value("\${app.refreshExpirationInMs}") private val refreshExpirationInMs: Long
+    @Value("\${app.refreshExpirationInMs}") private val refreshExpirationInMs: Long,
+    @Value("\${app.rabbitmq.QUEUE}") private val queue: String,
+    private val jacksonObjectMapper: ObjectMapper,
 ): BaseController() {
     private val log: Logger by logger()
 
@@ -102,7 +109,11 @@ class AuthController(
                 val httpHeaders = userIdHeader(userId = "${this.id}")
                     .apply { this.add("jwtExpiresIn", "$jwtExpirationInMs") }
                     .apply { this.add("refreshExpiresIn", "$refreshExpirationInMs") }
-                ResponseEntity.status(HttpStatus.OK).headers(httpHeaders).body(generateUserWrapperResponse)
+                    .also {
+                        val sd = ServiceData(action = Action.Login, message = jacksonObjectMapper.writeValueAsString(this))
+                        rabbitMessagingTemplate.convertAndSend(queue, jacksonObjectMapper.writeValueAsString(sd))
+                    }
+                ResponseEntity.ok().headers(httpHeaders).body(generateUserWrapperResponse)
             }
 
     @PostMapping("/register")

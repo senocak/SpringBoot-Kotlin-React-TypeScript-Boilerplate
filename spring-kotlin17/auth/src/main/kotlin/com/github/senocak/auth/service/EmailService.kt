@@ -1,6 +1,7 @@
 package com.github.senocak.auth.service
 
 import com.github.senocak.auth.domain.EmailActivationToken
+import com.github.senocak.auth.domain.Mail
 import com.github.senocak.auth.domain.MailConfigurationProperties
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.util.logger
@@ -111,6 +112,20 @@ class EmailService(
             log.info("[EmailService] Sent change password e-mail: ${user.id} - ${user.email}")
         } catch (e: Exception) {
             log.error("[EmailService] Failed to send change password e-mail: ${e.message}")
+        }
+    }
+
+    fun sendMail(mail: Mail) {
+        val msg = emailSender.createMimeMessage()
+        try {
+            val mimeMessageHelper = MimeMessageHelper(msg, true)
+            mimeMessageHelper.setTo(mail.to!!)
+            mimeMessageHelper.setFrom(mail.from!!)
+            mimeMessageHelper.setSubject(mail.subject!!)
+            mimeMessageHelper.setText(mail.content!!, true)
+            emailSender.send(msg)
+        } catch (e: Exception) {
+            log.error("Error while generating email message: ${e.message}")
         }
     }
 

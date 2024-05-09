@@ -46,6 +46,7 @@ dependencies {
 	//implementation("net.jodah:expiringmap:0.5.10")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 
 	runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("org.postgresql:postgresql")
@@ -55,6 +56,7 @@ dependencies {
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("org.springframework.amqp:spring-rabbit-test")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.testcontainers:postgresql")
@@ -63,7 +65,6 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-engine")
 	testImplementation("org.junit.jupiter:junit-jupiter-params")
 	testImplementation("org.instancio:instancio-junit:3.7.1")
-
 }
 
 tasks.withType<KotlinCompile> {
@@ -82,20 +83,10 @@ tasks.withType<Test> {
 	val testType: String = "unit"
 		.takeUnless { project.hasProperty("profile") }
 		?: "${project.property("profile")}"
-	println("Profile test type: $testType")
+	println(message = "Profile test type: $testType")
 	when (testType) {
-		"integration" -> {
-			include("**/*IT.*")
-		}
-		"unit" -> {
-			include("**/*Test.*")
-			exclude("**/*IT.*")
-		}
-		else -> {
-			// Default to unit
-			include("**/*Test.*")
-			include("**/*IT.*")
-		}
+		"integration" -> include("**/*IT.*")
+		else -> include("**/*Test.*", "**/*IT.*")
 	}
 }
 

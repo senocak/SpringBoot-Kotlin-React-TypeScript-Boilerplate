@@ -48,6 +48,7 @@ spring:
   docker:
     compose:
       lifecycle-management: none
+      enabled: false
 logging:
   level:
     net:
@@ -84,6 +85,14 @@ app:
     PORT: ${REDIS_PORT:6379}
     PASSWORD: ${REDIS_PASSWORD:senocak}
     TIMEOUT: ${REDIS_TIMEOUT:300}
+  rabbitmq:
+    HOST: ${RABBITMQ_HOST:localhost}
+    PORT: ${RABBITMQ_PORT:5672}
+    USER: ${RABBITMQ_USER:anil}
+    SECRET: ${RABBITMQ_SECRET:senocak}
+    EXCHANGE: ${EXCHANGE:spring-jwt-exchange}
+    QUEUE: ${QUEUE:spring-jwt-queue}
+    ROUTING_KEY: ${ROUTING_KEY:spring-jwt-routing-key}
 springdoc:
   api-docs:
     path: /api/v1/swagger
