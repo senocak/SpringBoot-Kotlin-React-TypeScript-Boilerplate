@@ -1,6 +1,7 @@
 package com.github.senocak.auth.config.initializer
 
 import com.github.senocak.auth.TestConstants
+import com.rabbitmq.client.ConnectionFactory
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -8,6 +9,7 @@ import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.springframework.boot.test.util.TestPropertyValues
+import com.rabbitmq.client.Channel
 
 @TestConfiguration
 class RabbitMqInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -22,22 +24,25 @@ class RabbitMqInitializer : ApplicationContextInitializer<ConfigurableApplicatio
             )
             .applyTo(configurableApplicationContext.environment)
 
-        //val factory = ConnectionFactory()
-        //factory.host = host
-        //factory.port = port
-        //factory.username = "guest"
-        //factory.password = "guest"
-        //try {
-        //    factory.newConnection().use { connection -> rabbitmq = connection.createChannel() }
-        //} catch (e: Exception) {
-        //    throw RuntimeException(e)
-        //}
-        //Assert.assertNotNull(rabbitmq)
+        val factory = ConnectionFactory()
+            .also {
+                it.host = host
+                it.port = port
+                it.username = "guest"
+                it.password = "guest"
+            }
+        try {
+            factory.newConnection().use { connection -> rabbitmq = connection.createChannel() }
+        } catch (e: Exception) {
+            throw RuntimeException(e)
+        }
+        if (rabbitmq == null)
+            throw RuntimeException("RabbitMQ is not initialized!")
     }
 
     companion object {
         private const val RABBIT_MQ_PORT = 5672
-        //var rabbitmq: Channel? = null
+        var rabbitmq: Channel? = null
 
         @Container private var CONTAINER: GenericContainer<*> = GenericContainer("rabbitmq:3.6-management-alpine")
             .withExposedPorts(RABBIT_MQ_PORT)

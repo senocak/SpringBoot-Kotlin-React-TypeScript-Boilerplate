@@ -1,5 +1,6 @@
 package com.github.senocak.auth.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.senocak.auth.TestConstants.USER_EMAIL
 import com.github.senocak.auth.TestConstants.USER_NAME
 import com.github.senocak.auth.TestConstants.USER_PASSWORD
@@ -42,6 +43,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
+import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -64,10 +66,12 @@ class AuthControllerTest {
     private val authenticationManager: AuthenticationManager = mock<AuthenticationManager>()
     private val eventPublisher: ApplicationEventPublisher = mock<ApplicationEventPublisher>()
     private val messageSourceService: MessageSourceService = mock<MessageSourceService>()
+    private val rabbitMessagingTemplate: RabbitMessagingTemplate = mock<RabbitMessagingTemplate>()
 
     private val authentication: Authentication = mock<Authentication>()
     private val bindingResult: BindingResult = mock<BindingResult>()
 
+    var objectMapper = ObjectMapper()
     var user: User = createTestUser()
     val role: Role = RoleName.ROLE_USER.createRole()
 
@@ -82,7 +86,10 @@ class AuthControllerTest {
             eventPublisher = eventPublisher,
             messageSourceService = messageSourceService,
             jwtExpirationInMs = 100,
-            refreshExpirationInMs = 100
+            refreshExpirationInMs = 100,
+            rabbitMessagingTemplate = rabbitMessagingTemplate,
+            jacksonObjectMapper = objectMapper,
+            queue = "queue"
         )
     }
 
