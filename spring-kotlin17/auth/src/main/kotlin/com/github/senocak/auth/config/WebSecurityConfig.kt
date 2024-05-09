@@ -56,9 +56,11 @@ class WebSecurityConfig(
                 authorize(pattern = "/swagger**/**", access = permitAll)
                 authorize(pattern = "/ws/**", access = permitAll)
                 authorize(pattern = "/api/v1/sse**/**", access = permitAll)
+                authorize(pattern = "/*.html", access = permitAll)
+                authorize(pattern = "/graphql/v1", access = permitAll)
                 //authorize(matches = PathRequest.toH2Console(), access = permitAll)
-                authorize(matches = anyRequest, access = authenticated)
                 //authorize(matches = CorsUtils::isPreFlightRequest, access = permitAll)
+                authorize(matches = anyRequest, access = authenticated)
             }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             headers { frameOptions { disable() } }

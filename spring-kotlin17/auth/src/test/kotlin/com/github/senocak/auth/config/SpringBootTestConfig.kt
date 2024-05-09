@@ -30,4 +30,5 @@ import org.springframework.transaction.annotation.Transactional
     RedisInitializer::class
 ])
 //@TestPropertySource({"/application-integration-test.yml" })
+//@TestPropertySource(properties = ["spring.autoconfigure.exclude=graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration"])
 annotation class SpringBootTestConfig

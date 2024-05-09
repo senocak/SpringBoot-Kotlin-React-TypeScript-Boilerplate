@@ -49,6 +49,10 @@ spring:
     compose:
       lifecycle-management: none
       enabled: false
+  graphql:
+    graphiql:
+      enabled: true
+    path: /graphql/v1
 logging:
   level:
     net:
@@ -56,6 +60,9 @@ logging:
         dsproxy:
           listener: debug
     org:
+      springframework:
+        web: debug
+        security: debug
       hibernate:
         SQL: off
   #file:

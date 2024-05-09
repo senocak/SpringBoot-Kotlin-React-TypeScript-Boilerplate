@@ -17,21 +17,15 @@ import org.springframework.context.annotation.Profile
 class AspectConfig {
     private val log: Logger by logger()
 
-    @Before(value = "execution(* com.github.senocak.controller.*.*(..))")
-    fun logStatementBefore(joinPoint: JoinPoint?) {
-        log.info("Starting executing $joinPoint")
-    }
+    @Before(value = "execution(* com.github.senocak.auth.controller.*.*(..))")
+    fun logStatementBefore(joinPoint: JoinPoint?) = log.info("Starting executing $joinPoint")
 
-    @After(value = "execution(* com.github.senocak.controller.*.*(..))")
-    fun logStatementAfter(joinPoint: JoinPoint?) {
-        log.info("Complete executing of $joinPoint")
-    }
+    @After(value = "execution(* com.github.senocak.auth.controller.*.*(..))")
+    fun logStatementAfter(joinPoint: JoinPoint?) = log.info("Complete executing of $joinPoint")
 
-    @Around(value = "execution(* com.github.senocak.controller.*.*(..))")
+    @Around(value = "execution(* com.github.senocak.auth.controller.*.*(..))")
     @Throws(Throwable::class)
-    fun timeTracker(joinPoint: ProceedingJoinPoint): Any {
-        return logStatement(joinPoint)
-    }
+    fun timeTracker(joinPoint: ProceedingJoinPoint): Any = logStatement(joinPoint = joinPoint)
 
     /**
      * @param joinPoint the join point

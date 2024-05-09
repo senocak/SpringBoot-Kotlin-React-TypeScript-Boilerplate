@@ -26,11 +26,11 @@ fun User.convertEntityToDto(): UserResponse =
 /**
  * @return -- RoleResponse object
  */
-fun Role.convertEntityToDto(): RoleResponse {
-    val roleResponse = RoleResponse()
-    roleResponse.name = this.name
-    return roleResponse
-}
+fun Role.convertEntityToDto(): RoleResponse =
+    RoleResponse()
+        .also {
+            it.name = this.name
+        }
 
 /**
  * @param date -- Date object to convert to long timestamp
@@ -43,7 +43,7 @@ private fun convertDateToLong(date: Date): Long = date.time / 1000
  * @return -- sluggable string variable
  */
 fun String.toSlug(input: String): String {
-    val nonLatin: Pattern = Pattern.compile("[^\\w-]")
+    val nonLatin: Pattern = "[^\\w-]".toPattern()
     val whiteSpace: Pattern = Pattern.compile("[\\s]")
     val noWhiteSpace: String = whiteSpace.matcher(input).replaceAll("-")
     val normalized: String = Normalizer.normalize(noWhiteSpace, Normalizer.Form.NFD)
@@ -62,9 +62,6 @@ fun Logger.changeLevel(loglevel: String) {
     this.warn("Logging level: ${this.name}")
     this.error("Logging level: ${this.name}")
 }
-
-//fun getLogger(): ch.qos.logback.classic.Logger =
-//    LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
 
 /**
  * Split a string into two parts, separated by a delimiter.

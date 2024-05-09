@@ -101,6 +101,7 @@ class AppConfig(
     @Bean
     fun customOpenAPI(
         @Value("\${spring.application.name}") title: String,
+        @Value("\${server.port}") port: String,
         @Value("\${springdoc.version}") appVersion: String
     ): OpenAPI {
         val securitySchemesItem: SecurityScheme = SecurityScheme()
@@ -114,7 +115,7 @@ class AppConfig(
             .description(title)
             .termsOfService("https://github.com/senocak")
             .license(License().name("Apache 2.0").url("https://springdoc.org"))
-        val server1: Server = Server().url("http://localhost:8080/").description("Local Server")
+        val server1: Server = Server().url("http://localhost:$port/").description("Local Server")
         return OpenAPI()
             .components(Components().addSecuritySchemes(SECURITY_SCHEME_NAME, securitySchemesItem))
             .info(license)
@@ -143,7 +144,7 @@ class AppConfig(
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
-    //@Bean
+    @Bean
     fun localeResolver(@Value("\${app.default-locale:en}") defaultLocale: String): LocaleResolver =
         SessionLocaleResolver()
             .also { it.setDefaultLocale(Locale.Builder().setLanguage(defaultLocale).build()) }

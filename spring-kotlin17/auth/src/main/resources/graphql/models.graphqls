@@ -1,0 +1,7 @@
+type Mutation {
+    changeLogLevel(loglevel: String): String
+}
+
+type Query {
+    getLogLevel: String
+}
