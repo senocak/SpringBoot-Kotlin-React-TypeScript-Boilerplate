@@ -4,7 +4,7 @@
 		"name": "kotlin spring boilerplate",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "7821151",
-		"_collection_link": "https://lively-comet-8198.postman.co/workspace/An%25C4%25B1l~d33d46fc-ebc0-4ccb-81ba-caceff009d2d/collection/7821151-b7c82eff-e36d-4571-a646-aa58e4290e55?action=share&source=collection_link&creator=7821151"
+		"_collection_link": "https://lively-comet-8198.postman.co/workspace/An%C4%B1l~d33d46fc-ebc0-4ccb-81ba-caceff009d2d/collection/7821151-b7c82eff-e36d-4571-a646-aa58e4290e55?action=share&source=collection_link&creator=7821151"
 	},
 	"item": [
 		{
@@ -131,7 +131,8 @@
 								"exec": [
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -143,7 +144,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"{{$randomFullName}}\",\n    \"email\": \"louie.stehr@ethereal.email\",\n    \"password\": \"asenocak\"\n}",
+							"raw": "{\n    \"name\": \"{{$randomFullName}}\",\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"Asenocak1.\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -547,6 +548,103 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "graphql",
+			"item": [
+				{
+					"name": "getLogLevel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\r\n    getLogLevel\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{url}}/graphql/v1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"graphql",
+								"v1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "changeLogLevel",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\r\n    changeLogLevel(loglevel: \"debug\")\r\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{url}}/graphql/v1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"graphql",
+								"v1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}

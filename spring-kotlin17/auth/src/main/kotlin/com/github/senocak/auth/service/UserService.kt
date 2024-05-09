@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -38,7 +39,8 @@ class UserService(
     private val emailActivationTokenService: EmailActivationTokenService,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val emailService: EmailService,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val jdbcTemplate: JdbcTemplate
 ): UserDetailsService {
     private val log: Logger by logger()
 
@@ -174,4 +176,6 @@ class UserService(
         passwordResetTokenRepository.delete(passwordResetToken)
         emailService.sendChangePasswordSuccess(user)
     }
+
+    fun countOfUsers(): Int = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Int::class.java)!!
 }

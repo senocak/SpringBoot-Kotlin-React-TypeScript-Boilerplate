@@ -1,0 +1,12 @@
+spring:
+  flyway:
+    enabled: false
+  liquibase:
+    enabled: false
+  datasource:
+    url: jdbc:tc:postgresql://localhost:5432/boilerplate?TC_INITSCRIPT=file:src/test/resources/db.sql
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
