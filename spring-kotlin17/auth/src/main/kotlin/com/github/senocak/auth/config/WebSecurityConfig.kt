@@ -4,7 +4,7 @@ import com.github.senocak.auth.security.JwtAuthenticationEntryPoint
 import com.github.senocak.auth.security.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -27,7 +27,7 @@ class WebSecurityConfig(
      * @param http -- It allows configuring web based security for specific http requests
      * @throws Exception -- throws Exception
      */
-    @Profile("!integration-test")
+    //@Profile("!integration-test")
     @Throws(Exception::class)
     @Bean
     fun securityFilterChainDSL(http: HttpSecurity): SecurityFilterChain =
@@ -58,6 +58,7 @@ class WebSecurityConfig(
                 authorize(pattern = "/api/v1/sse**/**", access = permitAll)
                 authorize(pattern = "/*.html", access = permitAll)
                 authorize(pattern = "/graphql/v1", access = permitAll)
+                authorize(method = HttpMethod.GET, pattern = "/api/v1/ping", access = permitAll)
                 //authorize(matches = PathRequest.toH2Console(), access = permitAll)
                 //authorize(matches = CorsUtils::isPreFlightRequest, access = permitAll)
                 authorize(matches = anyRequest, access = authenticated)

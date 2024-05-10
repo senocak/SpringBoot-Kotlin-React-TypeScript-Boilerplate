@@ -12,6 +12,10 @@ import org.springframework.web.socket.TextMessage
 import java.io.IOException
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import org.slf4j.MDC
+import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.web.socket.PingMessage
 
 @Service
 class WebSocketCacheService(
@@ -120,7 +124,7 @@ class WebSocketCacheService(
         try {
             userTo.session!!.sendMessage(TextMessage(objectMapper.writeValueAsString(requestBody)))
         } catch (e: IOException) {
-            log.error("Exception while sending message: ${ExceptionUtils.getMessage(e)}")
+            log.error("Exception while sending message: ${e.message}")
         }
     }
 
@@ -130,4 +134,23 @@ class WebSocketCacheService(
      */
     private fun broadCastAllUserList(to: String): Unit =
         sendMessage(from = null, to = to, type = "online", payload = StringUtils.join(userSessionCache.keys,','))
+
+    /**
+     * this is scheduled to run every in 10_000 milliseconds period // every 10 seconds
+     */
+    @Async
+    @Scheduled(fixedRate = 10_000)
+    fun pingWs() {
+        MDC.put("userId", "scheduler")
+        allWebSocketSession.forEach { it: Map.Entry<String, WebsocketIdentifier> ->
+            try {
+                it.value.session!!.sendMessage(PingMessage())
+                log.info("Pinged user with key: ${it.key}, and session: ${it.value}")
+            } catch (e: Exception) {
+                log.error("Exception occurred for sending ping message: ${e.message}")
+                deleteSession(key = it.key)
+            }
+        }
+        MDC.remove("userId")
+    }
 }

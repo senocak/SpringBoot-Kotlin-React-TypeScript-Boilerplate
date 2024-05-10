@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.function.Executable
-import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -18,8 +17,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.mockito.InjectMocks
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.core.userdetails.User as SecurityUser
 
@@ -28,14 +29,15 @@ import org.springframework.security.core.userdetails.User as SecurityUser
 @DisplayName("Unit Tests for UserService")
 class UserServiceTest {
     @InjectMocks lateinit var userService: UserService
-    private val userRepository: UserRepository = Mockito.mock(UserRepository::class.java)
-    private val messageSourceService: MessageSourceService = Mockito.mock(MessageSourceService::class.java)
-    private val emailActivationTokenService: EmailActivationTokenService = Mockito.mock(EmailActivationTokenService::class.java)
-    private val passwordResetTokenRepository: PasswordResetTokenRepository = Mockito.mock(PasswordResetTokenRepository::class.java)
-    private val emailService: EmailService = Mockito.mock(EmailService::class.java)
-    private val passwordEncoder: PasswordEncoder = Mockito.mock(PasswordEncoder::class.java)
-    private var auth: Authentication = Mockito.mock(Authentication::class.java)
-    private var securityUser: SecurityUser = Mockito.mock(SecurityUser::class.java)
+    private val userRepository: UserRepository = mock(UserRepository::class.java)
+    private val messageSourceService: MessageSourceService = mock(MessageSourceService::class.java)
+    private val emailActivationTokenService: EmailActivationTokenService = mock(EmailActivationTokenService::class.java)
+    private val passwordResetTokenRepository: PasswordResetTokenRepository = mock(PasswordResetTokenRepository::class.java)
+    private val emailService: EmailService = mock(EmailService::class.java)
+    private val passwordEncoder: PasswordEncoder = mock(PasswordEncoder::class.java)
+    private var auth: Authentication = mock(Authentication::class.java)
+    private var securityUser: SecurityUser = mock(SecurityUser::class.java)
+    private val jdbcTemplate = mock<JdbcTemplate>()
 
     @Test
     fun givenEmail_whenFindByUsername_thenAssertResult() {

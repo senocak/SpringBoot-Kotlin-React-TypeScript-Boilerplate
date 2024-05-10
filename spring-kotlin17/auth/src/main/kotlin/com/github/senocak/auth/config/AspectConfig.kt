@@ -23,9 +23,9 @@ class AspectConfig {
     @After(value = "execution(* com.github.senocak.auth.controller.*.*(..))")
     fun logStatementAfter(joinPoint: JoinPoint?) = log.info("Complete executing of $joinPoint")
 
-    @Around(value = "execution(* com.github.senocak.auth.controller.*.*(..))")
+    @Around(value = "execution(* com.github.senocak.auth.controller.*.*(..)) && !execution(* com.github.senocak.auth.controller.GraphQLController.printRuntimeDataEvery10Seconds(..))")
     @Throws(Throwable::class)
-    fun timeTracker(joinPoint: ProceedingJoinPoint): Any = logStatement(joinPoint = joinPoint)
+    fun timeTracker(joinPoint: ProceedingJoinPoint) = logStatement(joinPoint = joinPoint)
 
     /**
      * @param joinPoint the join point
@@ -45,7 +45,7 @@ class AspectConfig {
         }
         val obj = joinPoint.proceed()
         val timeTaken = System.currentTimeMillis() - start
-        log.trace("Method: ${joinPoint.signature.name} invoke with arguments ${builder}. Took $timeTaken ms")
+        log.trace("Method: ${joinPoint.signature.name} invoke with arguments $builder. Took $timeTaken ms")
         return obj
     }
 }

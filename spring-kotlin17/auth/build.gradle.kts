@@ -19,6 +19,7 @@ repositories {
 }
 val jjwt = "0.11.5"
 val debezium = "2.7.0.Alpha1"
+val cucumber = "4.2.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -34,6 +35,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.springframework.boot:spring-boot-starter-graphql")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
 	implementation("com.google.guava:guava:33.0.0-jre")
@@ -45,9 +47,9 @@ dependencies {
 	implementation("com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.9.0")
 	implementation("org.passay:passay:1.6.2")
 	//implementation("net.jodah:expiringmap:0.5.10")
+	implementation("commons-io:commons-io:2.16.1")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.springframework.boot:spring-boot-starter-amqp")
 
 	runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
 	runtimeOnly("org.postgresql:postgresql")
@@ -66,6 +68,9 @@ dependencies {
 	testImplementation("org.junit.jupiter:junit-jupiter-engine")
 	testImplementation("org.junit.jupiter:junit-jupiter-params")
 	testImplementation("org.instancio:instancio-junit:3.7.1")
+	testImplementation("io.cucumber:cucumber-java:$cucumber")
+	testImplementation("io.cucumber:cucumber-junit:$cucumber")
+	testImplementation("io.cucumber:cucumber-spring:$cucumber")
 }
 
 tasks.withType<KotlinCompile> {
