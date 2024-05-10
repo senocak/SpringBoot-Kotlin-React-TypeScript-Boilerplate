@@ -3,6 +3,7 @@ package com.github.senocak.auth.config
 import com.github.senocak.auth.domain.dto.ExceptionDto
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.logger
+import jakarta.servlet.RequestDispatcher
 import org.slf4j.Logger
 import org.springframework.boot.web.error.ErrorAttributeOptions
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes
@@ -10,7 +11,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.web.context.request.RequestAttributes
 import org.springframework.web.context.request.WebRequest
-import jakarta.servlet.RequestDispatcher
 
 @Configuration
 @Profile("!integration-test")
@@ -28,7 +28,7 @@ class CustomErrorAttributes : DefaultErrorAttributes() {
             exceptionDto.error = ExceptionDto.OmaErrorMessageTypeDto(omaErrorMessageType.messageId, omaErrorMessageType.text)
         }
         return HashMap<String, Any>()
-                .also { it["exception"] = exceptionDto }
-                .also { log.warn("Exception occurred in DefaultErrorAttributes: $it") }
+            .also { it["exception"] = exceptionDto }
+            .also { log.warn("Exception occurred in DefaultErrorAttributes: $it") }
     }
 }

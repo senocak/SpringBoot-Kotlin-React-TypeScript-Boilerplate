@@ -22,7 +22,7 @@ class UserWrapperResponse(
 
     @Schema(example = "eyJraWQiOiJ...", description = "Refresh Token", required = false, name = "token", type = "String")
     var refreshToken: String
-): BaseDto()
+) : BaseDto()
 
 data class LoginRequest(
     @JsonProperty("email")
@@ -35,14 +35,14 @@ data class LoginRequest(
     @field:NotBlank(message = "{not_blank}")
     @field:Size(min = 6, max = 20, message = "{min_max_length}")
     var password: String
-): BaseDto()
+) : BaseDto()
 
 data class RefreshTokenRequest(
     @Schema(example = "Lorem Ipsum", description = "Name of the user", required = true, name = "name", type = "String")
     @field:NotBlank(message = "{not_blank}")
     @field:Size(min = 49, max = 51, message = "{min_max_length}")
     var token: String
-): BaseDto()
+) : BaseDto()
 
 data class RegisterRequest(
     @Schema(example = "Lorem Ipsum", description = "Name of the user", required = true, name = "name", type = "String")
@@ -59,7 +59,7 @@ data class RegisterRequest(
     @field:Size(min = 6, max = 20, message = "{min_max_length}")
     @field:Password(message = "{invalid_password}", detailedMessage = true)
     var password: String
-): BaseDto()
+) : BaseDto()
 
 class RoleResponse : BaseDto() {
     @Schema(example = "ROLE_USER", description = "Name of the role", required = true, name = "name")

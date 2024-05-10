@@ -7,7 +7,7 @@ enum class RoleName(@JsonValue val role: String) {
     ROLE_ADMIN(AppConstants.ADMIN);
 
     companion object {
-       fun fromString(r: String): RoleName? {
+        fun fromString(r: String): RoleName? {
             for (it: RoleName in entries) {
                 if (it.role == r || it.name == r) {
                     return it

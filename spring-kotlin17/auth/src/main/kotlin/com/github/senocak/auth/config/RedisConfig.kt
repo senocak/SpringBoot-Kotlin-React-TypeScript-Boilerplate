@@ -11,13 +11,13 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager.RedisCacheManagerBuilder
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+import org.springframework.data.redis.core.RedisKeyValueAdapter
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import redis.clients.jedis.JedisPool
 import redis.clients.jedis.JedisPoolConfig
 import java.time.Duration
-import org.springframework.data.redis.core.RedisKeyValueAdapter
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 
 @Configuration
 @EnableCaching
@@ -25,10 +25,17 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 class RedisConfig {
     private val log: Logger by logger()
 
-    @Value("\${app.redis.HOST}") private var host: String? = null
-    @Value("\${app.redis.PORT}") private var port: Int = 0
-    @Value("\${app.redis.PASSWORD}") private var password: String? = null
-    @Value("\${app.redis.TIMEOUT}") private var timeout: Int = 0
+    @Value("\${app.redis.HOST}")
+    private var host: String? = null
+
+    @Value("\${app.redis.PORT}")
+    private var port: Int = 0
+
+    @Value("\${app.redis.PASSWORD}")
+    private var password: String? = null
+
+    @Value("\${app.redis.TIMEOUT}")
+    private var timeout: Int = 0
 
     @Bean
     fun jedisPool(): JedisPool {

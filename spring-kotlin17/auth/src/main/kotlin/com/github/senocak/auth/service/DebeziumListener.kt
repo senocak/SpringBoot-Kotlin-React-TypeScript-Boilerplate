@@ -10,16 +10,16 @@ import io.debezium.embedded.Connect
 import io.debezium.engine.DebeziumEngine
 import io.debezium.engine.RecordChangeEvent
 import io.debezium.engine.format.ChangeEventFormat
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 import org.apache.kafka.connect.data.Struct
 import org.apache.kafka.connect.source.SourceRecord
 import org.slf4j.Logger
 import org.springframework.context.SmartLifecycle
 import org.springframework.stereotype.Service
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 @Service
-class DebeziumListener(configuration: Configuration): SmartLifecycle {
+class DebeziumListener(configuration: Configuration) : SmartLifecycle {
     private var running: Boolean = false
     private val log: Logger by logger()
     private val executor: Executor = Executors.newSingleThreadExecutor()
@@ -30,7 +30,7 @@ class DebeziumListener(configuration: Configuration): SmartLifecycle {
             DebeziumEngine.create(ChangeEventFormat.of(Connect::class.java))
                 .using(configuration.asProperties())
                 .notifying {
-                    sourceRecordRecordChangeEvent: RecordChangeEvent<SourceRecord> ->
+                        sourceRecordRecordChangeEvent: RecordChangeEvent<SourceRecord> ->
                     this.handleChangeEvent(sourceRecordRecordChangeEvent)
                 }
                 .build()

@@ -12,7 +12,7 @@ data class WebsocketIdentifier(
 
     @Schema(description = "session", name = "session", type = "String", example = "session", required = true)
     var session: WebSocketSession? = null
-): BaseDto()
+) : BaseDto()
 
 data class WsRequestBody(
     var from: String? = null,
@@ -20,4 +20,4 @@ data class WsRequestBody(
     var content: String? = null,
     var type: String? = null,
     var date: Long? = null
-): BaseDto()
+) : BaseDto()

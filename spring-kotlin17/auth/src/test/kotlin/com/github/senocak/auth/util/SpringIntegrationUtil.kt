@@ -1,7 +1,5 @@
 package com.github.senocak.auth.util
 
-import java.io.IOException
-import java.nio.charset.Charset
 import org.apache.commons.io.IOUtils
 import org.json.JSONObject
 import org.springframework.http.HttpEntity
@@ -15,10 +13,12 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestTemplate
+import java.io.IOException
+import java.nio.charset.Charset
 
 class SpringIntegrationUtil(
     private var randomPort: Int
-){
+) {
     private val restTemplate = RestTemplate()
 
     @Throws(IOException::class)
@@ -29,9 +29,12 @@ class SpringIntegrationUtil(
         val errorHandler = ResponseResultErrorHandler()
 
         restTemplate.errorHandler = errorHandler
-        latestResponse = restTemplate.execute("$BASE$randomPort$SUFFIX$url",
-            HttpMethod.GET, requestCallback,
-            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(response) })
+        latestResponse = restTemplate.execute(
+            "$BASE$randomPort$SUFFIX$url",
+            HttpMethod.GET,
+            requestCallback,
+            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(response) }
+        )
     }
 
     @Throws(IOException::class)
@@ -42,9 +45,12 @@ class SpringIntegrationUtil(
         val errorHandler = ResponseResultErrorHandler()
 
         restTemplate.errorHandler = errorHandler
-        latestResponse = restTemplate.execute("$BASE$randomPort$SUFFIX$url",
-            HttpMethod.DELETE, requestCallback,
-            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(theResponse = response) })
+        latestResponse = restTemplate.execute(
+            "$BASE$randomPort$SUFFIX$url",
+            HttpMethod.DELETE,
+            requestCallback,
+            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(theResponse = response) }
+        )
     }
 
     @Throws(IOException::class)
@@ -58,9 +64,12 @@ class SpringIntegrationUtil(
         }
         val errorHandler = ResponseResultErrorHandler()
         restTemplate.errorHandler = errorHandler
-        latestResponse = restTemplate.execute("$BASE$randomPort$SUFFIX$url",
-            HttpMethod.PUT, requestCallback,
-            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(theResponse = response) })
+        latestResponse = restTemplate.execute(
+            "$BASE$randomPort$SUFFIX$url",
+            HttpMethod.PUT,
+            requestCallback,
+            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(theResponse = response) }
+        )
     }
 
     fun executePost(url: String, entries: Map<String?, Any?>?) {
@@ -71,9 +80,12 @@ class SpringIntegrationUtil(
         requestCallback.body = JSONObject(entries).toString()
         val errorHandler = ResponseResultErrorHandler()
         restTemplate.errorHandler = errorHandler
-        latestResponse = restTemplate.execute("$BASE$randomPort$SUFFIX$url",
-            HttpMethod.POST, requestCallback,
-            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(theResponse = response) })
+        latestResponse = restTemplate.execute(
+            "$BASE$randomPort$SUFFIX$url",
+            HttpMethod.POST,
+            requestCallback,
+            { response -> if (errorHandler.hadError) errorHandler.getResults() else ResponseResults(theResponse = response) }
+        )
     }
 
     fun executePostWithMultipartFormData(
@@ -85,11 +97,15 @@ class SpringIntegrationUtil(
         headers.accept = listOf(element = MediaType.APPLICATION_JSON)
 
         val requestEntity: HttpEntity<*> = HttpEntity<Any?>(bodyMap, headers)
-        return restTemplate.exchange("$BASE$randomPort$SUFFIX$url",
-            HttpMethod.POST, requestEntity, String::class.java)
+        return restTemplate.exchange(
+            "$BASE$randomPort$SUFFIX$url",
+            HttpMethod.POST,
+            requestEntity,
+            String::class.java
+        )
     }
 
-    private inner class ResponseResultErrorHandler: ResponseErrorHandler {
+    private inner class ResponseResultErrorHandler : ResponseErrorHandler {
         private var results: ResponseResults? = null
         var hadError = false
 
@@ -115,7 +131,7 @@ class SpringIntegrationUtil(
 
 class HeaderSettingRequestCallback(
     private val requestHeaders: Map<String, String>
-): RequestCallback {
+) : RequestCallback {
     var body: String? = null
 
     @Throws(IOException::class)
@@ -130,6 +146,6 @@ class HeaderSettingRequestCallback(
     }
 }
 
-class ResponseResults (val theResponse: ClientHttpResponse) {
+class ResponseResults(val theResponse: ClientHttpResponse) {
     val body: String = IOUtils.toString(theResponse.body, Charset.defaultCharset())
 }

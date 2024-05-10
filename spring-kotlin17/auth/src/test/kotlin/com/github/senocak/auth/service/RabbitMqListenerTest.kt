@@ -25,12 +25,15 @@ class RabbitMqListenerTest {
     private lateinit var rabbitMqListener: RabbitMqListener
     private val emailService: EmailService = Mockito.mock(EmailService::class.java)
     private val htmlTemplateEngine: ITemplateEngine = mock<ITemplateEngine>()
-    private val objectMapper = jacksonObjectMapper().registerModule(KotlinModule.Builder() .build())
+    private val objectMapper = jacksonObjectMapper().registerModule(KotlinModule.Builder().build())
 
     @BeforeEach
     fun init() {
-        rabbitMqListener = RabbitMqListener(objectMapper = objectMapper,
-            emailService = emailService, htmlTemplateEngine = htmlTemplateEngine)
+        rabbitMqListener = RabbitMqListener(
+            objectMapper = objectMapper,
+            emailService = emailService,
+            htmlTemplateEngine = htmlTemplateEngine
+        )
     }
 
     @Test

@@ -1,10 +1,10 @@
 package com.github.senocak.auth.util
 
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
-import java.text.ParseException;
 
 object DateUtil {
     private const val SECOND_MILLIS = 1000
@@ -17,21 +17,32 @@ object DateUtil {
         calendar.timeInMillis = _time
         val year = calendar[Calendar.YEAR]
         val currentYear = Calendar.getInstance()[Calendar.YEAR]
-        if (_time < 1000000000000L)
+        if (_time < 1000000000000L) {
             _time *= 1000
+        }
         val now = System.currentTimeMillis()
-        if (_time > now || _time <= 0)
+        if (_time > now || _time <= 0) {
             return null
+        }
 
         val diff = now - _time
-        return  if (diff < MINUTE_MILLIS) "just now"
-                else if (diff < 2 * MINUTE_MILLIS) "a minute ago"
-                else if (diff < 50 * MINUTE_MILLIS) (diff / MINUTE_MILLIS).toString() + " minutes ago"
-                else if (diff < 90 * MINUTE_MILLIS) "an hour ago"
-                else if (diff < 24 * HOUR_MILLIS) (diff / HOUR_MILLIS).toString() + " hours ago"
-                else if (diff < 48 * HOUR_MILLIS) "yesterday at " + SimpleDateFormat("hh:mm a").format(calendar.time)
-                else if (year == currentYear) "On " + SimpleDateFormat("MMM dd hh:mm a").format(calendar.time)
-                else "On " + SimpleDateFormat("yyyy MMM dd hh:mm a").format(calendar.time)
+        return if (diff < MINUTE_MILLIS) {
+            "just now"
+        } else if (diff < 2 * MINUTE_MILLIS) {
+            "a minute ago"
+        } else if (diff < 50 * MINUTE_MILLIS) {
+            (diff / MINUTE_MILLIS).toString() + " minutes ago"
+        } else if (diff < 90 * MINUTE_MILLIS) {
+            "an hour ago"
+        } else if (diff < 24 * HOUR_MILLIS) {
+            (diff / HOUR_MILLIS).toString() + " hours ago"
+        } else if (diff < 48 * HOUR_MILLIS) {
+            "yesterday at " + SimpleDateFormat("hh:mm a").format(calendar.time)
+        } else if (year == currentYear) {
+            "On " + SimpleDateFormat("MMM dd hh:mm a").format(calendar.time)
+        } else {
+            "On " + SimpleDateFormat("yyyy MMM dd hh:mm a").format(calendar.time)
+        }
     }
 
     @Throws(ParseException::class)

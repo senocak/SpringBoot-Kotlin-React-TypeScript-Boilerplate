@@ -6,9 +6,6 @@ import com.github.senocak.auth.service.MessageSourceService
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.logger
 import jakarta.validation.ConstraintViolationException
-import java.lang.reflect.UndeclaredThrowableException
-import java.security.InvalidParameterException
-import java.util.function.Consumer
 import org.slf4j.Logger
 import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpStatus
@@ -28,12 +25,15 @@ import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
-//import org.springframework.web.servlet.resource.NoResourceFoundException
+import java.lang.reflect.UndeclaredThrowableException
+import java.security.InvalidParameterException
+import java.util.function.Consumer
+// import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class RestExceptionHandler(
     private val messageSourceService: MessageSourceService
-){
+) {
     private val log: Logger by logger()
 
     @ExceptionHandler(
@@ -48,9 +48,11 @@ class RestExceptionHandler(
         UndeclaredThrowableException::class
     )
     fun handleBadRequestException(ex: Exception): ResponseEntity<Any> =
-        generateResponseEntity(httpStatus = HttpStatus.BAD_REQUEST,
+        generateResponseEntity(
+            httpStatus = HttpStatus.BAD_REQUEST,
             variables = arrayOf(messageSourceService.get(code = "malformed_json_request"), ex.message),
-            omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT)
+            omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT
+        )
 
     @ExceptionHandler(
         AccessDeniedException::class,
@@ -58,40 +60,56 @@ class RestExceptionHandler(
         com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException::class
     )
     fun handleUnAuthorized(ex: Exception): ResponseEntity<Any> =
-        generateResponseEntity(httpStatus = HttpStatus.UNAUTHORIZED, variables = arrayOf(ex.message),
-            omaErrorMessageType = OmaErrorMessageType.UNAUTHORIZED)
+        generateResponseEntity(
+            httpStatus = HttpStatus.UNAUTHORIZED,
+            variables = arrayOf(ex.message),
+            omaErrorMessageType = OmaErrorMessageType.UNAUTHORIZED
+        )
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
     fun handleHttpRequestMethodNotSupported(ex: HttpRequestMethodNotSupportedException): ResponseEntity<Any> =
-        generateResponseEntity(httpStatus = HttpStatus.METHOD_NOT_ALLOWED,
+        generateResponseEntity(
+            httpStatus = HttpStatus.METHOD_NOT_ALLOWED,
             variables = arrayOf(messageSourceService.get(code = "method_not_supported"), ex.message),
-            omaErrorMessageType = OmaErrorMessageType.EXTRA_INPUT_NOT_ALLOWED)
+            omaErrorMessageType = OmaErrorMessageType.EXTRA_INPUT_NOT_ALLOWED
+        )
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
     fun handleHttpMediaTypeNotSupported(ex: HttpMediaTypeNotSupportedException): ResponseEntity<Any> =
-        generateResponseEntity(httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-            omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT, variables = arrayOf(ex.message))
+        generateResponseEntity(
+            httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+            omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+            variables = arrayOf(ex.message)
+        )
 
     @ExceptionHandler(
         NoHandlerFoundException::class,
-        UsernameNotFoundException::class,
-        //NoResourceFoundException::class
+        UsernameNotFoundException::class
+        // NoResourceFoundException::class
     )
     fun handleNoHandlerFoundException(ex: Exception): ResponseEntity<Any> =
-        generateResponseEntity(httpStatus = HttpStatus.NOT_FOUND,
-            omaErrorMessageType = OmaErrorMessageType.NOT_FOUND, variables = arrayOf(ex.message))
+        generateResponseEntity(
+            httpStatus = HttpStatus.NOT_FOUND,
+            omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
+            variables = arrayOf(ex.message)
+        )
 
     @ExceptionHandler(BindException::class)
     fun handleBindException(ex: BindException): ResponseEntity<Any> =
         arrayListOf(messageSourceService.get(code = "validation_error"))
             .apply {
-                ex.bindingResult.allErrors.forEach(Consumer { error: ObjectError ->
-                    this.add(element = "${(error as FieldError).field}: ${error.defaultMessage}")
-                })
+                ex.bindingResult.allErrors.forEach(
+                    Consumer { error: ObjectError ->
+                        this.add(element = "${(error as FieldError).field}: ${error.defaultMessage}")
+                    }
+                )
             }
             .run {
-                generateResponseEntity(httpStatus = HttpStatus.UNPROCESSABLE_ENTITY,
-                    variables = this.toTypedArray(), omaErrorMessageType = OmaErrorMessageType.GENERIC_SERVICE_ERROR)
+                generateResponseEntity(
+                    httpStatus = HttpStatus.UNPROCESSABLE_ENTITY,
+                    variables = this.toTypedArray(),
+                    omaErrorMessageType = OmaErrorMessageType.GENERIC_SERVICE_ERROR
+                )
             }
 
     @ExceptionHandler(ServerException::class)
@@ -100,9 +118,11 @@ class RestExceptionHandler(
 
     @ExceptionHandler(Exception::class)
     fun handleGeneralException(ex: Exception): ResponseEntity<Any> =
-        generateResponseEntity(httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+        generateResponseEntity(
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
             variables = arrayOf(messageSourceService.get(code = "server_error"), ex.message),
-            omaErrorMessageType = OmaErrorMessageType.GENERIC_SERVICE_ERROR)
+            omaErrorMessageType = OmaErrorMessageType.GENERIC_SERVICE_ERROR
+        )
 
     /**
      * @param httpStatus -- returned code

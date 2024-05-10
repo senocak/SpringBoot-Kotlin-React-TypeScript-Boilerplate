@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 class WebsocketConfig(
     private val websocketChannelHandler: WebsocketChannelHandler,
     private val httpHandshakeInterceptor: HttpHandshakeInterceptor
-): WebSocketConfigurer {
+) : WebSocketConfigurer {
     /**
      * Register websocket handlers.
      * @param registry WebSocketHandlerRegistry

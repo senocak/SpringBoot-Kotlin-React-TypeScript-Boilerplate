@@ -8,16 +8,16 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.function.Executable
+import org.mockito.InjectMocks
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.mock
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import java.nio.file.AccessDeniedException
-import org.mockito.InjectMocks
-import org.mockito.kotlin.mock
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)

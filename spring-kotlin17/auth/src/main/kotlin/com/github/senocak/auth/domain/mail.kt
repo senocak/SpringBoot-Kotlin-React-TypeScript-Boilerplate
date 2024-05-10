@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @ConfigurationProperties(prefix = "app.mail")
-class MailConfigurationProperties{
+class MailConfigurationProperties {
     lateinit var host: String
     lateinit var port: String
     lateinit var protocol: String

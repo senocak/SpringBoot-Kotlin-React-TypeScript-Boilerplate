@@ -3,15 +3,15 @@ package com.github.senocak.auth.security
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.senocak.auth.exception.RestExceptionHandler
 import com.github.senocak.auth.util.logger
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
 import java.io.IOException
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.MediaType
 
 @Component
 class JwtAuthenticationEntryPoint(

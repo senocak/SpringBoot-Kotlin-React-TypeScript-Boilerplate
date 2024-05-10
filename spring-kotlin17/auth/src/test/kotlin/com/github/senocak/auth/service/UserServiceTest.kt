@@ -4,23 +4,23 @@ import com.github.senocak.auth.createTestUser
 import com.github.senocak.auth.domain.PasswordResetTokenRepository
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.UserRepository
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.function.Executable
-import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.mockito.InjectMocks
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.doReturn
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.core.userdetails.User as SecurityUser
 

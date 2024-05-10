@@ -15,7 +15,8 @@ abstract class BaseController {
             arrayListOf<String>()
                 .apply {
                     resultOfValidation.fieldErrors.forEach {
-                        fieldError: FieldError? -> this.add(element = "${fieldError?.field}: ${fieldError?.defaultMessage}")
+                            fieldError: FieldError? ->
+                        this.add(element = "${fieldError?.field}: ${fieldError?.defaultMessage}")
                     }
                 }
                 .apply {

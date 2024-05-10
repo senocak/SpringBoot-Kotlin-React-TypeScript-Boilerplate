@@ -2,12 +2,12 @@ package com.github.senocak.auth.service
 
 import com.github.senocak.auth.util.logger
 import org.slf4j.Logger
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Service
 import java.nio.file.AccessDeniedException
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.GrantedAuthority
 
 @Service
 class AuthenticationService {
@@ -17,7 +17,7 @@ class AuthenticationService {
     /**
      * Getting username from the security context
      * @param aInRoles -- roles that user must have
-     * @return  -- username or null
+     * @return -- username or null
      * @throws AccessDeniedException -- if user does not have required roles
      */
     @Throws(AccessDeniedException::class)
@@ -28,8 +28,9 @@ class AuthenticationService {
         try {
             for (role: String in aInRoles) {
                 for (authority: GrantedAuthority in getPrinciple.authorities) {
-                    if (authority.authority == "ROLE_$role")
+                    if (authority.authority == "ROLE_$role") {
                         return true
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -47,7 +48,9 @@ class AuthenticationService {
             val authentication: Authentication = SecurityContextHolder.getContext().authentication
             if (authentication.principal is User) {
                 authentication.principal as User
-            } else null
+            } else {
+                null
+            }
         } catch (e: Exception) {
             log.warn("Exception occurred, returning null")
             null

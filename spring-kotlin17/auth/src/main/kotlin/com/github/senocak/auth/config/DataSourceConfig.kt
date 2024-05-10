@@ -1,11 +1,11 @@
 package com.github.senocak.auth.config
 
-import javax.sql.DataSource
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import org.springframework.stereotype.Component
+import javax.sql.DataSource
 
 @Component
 @ConfigurationProperties(prefix = "spring.datasource")
@@ -24,7 +24,7 @@ class DataSourceConfig {
                     db.url = url
                     db.username = username
                     db.password = password
-                    //db.setDriverClassName(dataSourceProperties.dbtype)
+                    // db.setDriverClassName(dataSourceProperties.dbtype)
                 }
             else -> throw RuntimeException("Not configured")
         }

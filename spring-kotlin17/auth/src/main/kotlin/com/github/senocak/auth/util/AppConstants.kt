@@ -11,7 +11,7 @@ object AppConstants {
 }
 
 private class RandomStringGenerator(
-    private val length: Int = 1,
+    private val length: Int = 1
 ) {
     private val symbols: CharArray = ALPHA_NUM.toCharArray()
     private val buf: CharArray = CharArray(size = length)

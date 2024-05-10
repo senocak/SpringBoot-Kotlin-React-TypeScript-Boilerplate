@@ -9,9 +9,11 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ContainerCustomizationBean : WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
     override fun customize(factory: TomcatServletWebServerFactory) {
-        factory.addConnectorCustomizers(TomcatConnectorCustomizer { connector: Connector ->
-            connector.setProperty("maxThreads", "2000")
-            connector.setProperty("acceptorThreadCount", "1")
-        })
+        factory.addConnectorCustomizers(
+            TomcatConnectorCustomizer { connector: Connector ->
+                connector.setProperty("maxThreads", "2000")
+                connector.setProperty("acceptorThreadCount", "1")
+            }
+        )
     }
 }

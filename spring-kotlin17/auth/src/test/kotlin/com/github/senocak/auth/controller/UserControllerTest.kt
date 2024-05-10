@@ -6,30 +6,26 @@ import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.dto.UpdateUserDto
 import com.github.senocak.auth.domain.dto.UserPaginationDTO
 import com.github.senocak.auth.domain.dto.UserResponse
-import com.github.senocak.auth.domain.dto.UserWrapperResponse
 import com.github.senocak.auth.exception.ServerException
 import com.github.senocak.auth.service.MessageSourceService
 import com.github.senocak.auth.service.UserService
 import com.github.senocak.auth.util.OmaErrorMessageType
+import jakarta.servlet.http.HttpServletRequest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.function.Executable
+import org.mockito.InjectMocks
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.validation.BindingResult
-import jakarta.servlet.http.HttpServletRequest
-import org.mockito.InjectMocks
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.springframework.data.domain.Page
@@ -37,6 +33,8 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.validation.BindingResult
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
@@ -51,7 +49,7 @@ class UserControllerTest {
 
     @Nested
     internal inner class GetMeTest {
-        
+
         @Test
         @Throws(ServerException::class)
         fun givenServerException_whenGetMe_thenThrowServerException() {

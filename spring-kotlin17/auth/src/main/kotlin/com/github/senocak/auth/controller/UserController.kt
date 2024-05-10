@@ -51,7 +51,7 @@ class UserController(
     private val userService: UserService,
     private val passwordEncoder: PasswordEncoder,
     private val messageSourceService: MessageSourceService
-): BaseController() {
+) : BaseController() {
     private val log: Logger by logger()
 
     @Throws(ServerException::class)
@@ -59,10 +59,16 @@ class UserController(
         summary = "Get me",
         tags = ["User"],
         responses = [
-            ApiResponse(responseCode = "200", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))),
-            ApiResponse(responseCode = "500", description = "internal server error occurred",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
+            ApiResponse(
+                responseCode = "200",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
         ],
         security = [SecurityRequirement(name = SECURITY_SCHEME_NAME, scopes = [ADMIN, USER])]
     )
@@ -71,45 +77,63 @@ class UserController(
 
     @PatchMapping("/me")
     @Operation(
-            summary = "Update user by username",
-            tags = ["User"],
-            responses = [
-                ApiResponse(responseCode = "200", description = "successful operation",
-                        content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = HashMap::class)))),
-                ApiResponse(responseCode = "500", description = "internal server error occurred",
-                        content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-            ],
-            security = [SecurityRequirement(name = SECURITY_SCHEME_NAME, scopes = [ADMIN, USER])]
+        summary = "Update user by username",
+        tags = ["User"],
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = HashMap::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ],
+        security = [SecurityRequirement(name = SECURITY_SCHEME_NAME, scopes = [ADMIN, USER])]
     )
     @Throws(ServerException::class)
-    fun patchMe(request: HttpServletRequest,
+    fun patchMe(
+        request: HttpServletRequest,
         @Parameter(description = "Request body to update", required = true) @Validated @RequestBody userDto: UpdateUserDto,
         resultOfValidation: BindingResult
     ): UserResponse {
         validate(resultOfValidation = resultOfValidation)
         val user: User = userService.loggedInUser()
         val name: String? = userDto.name
-        if (!name.isNullOrEmpty())
+        if (!name.isNullOrEmpty()) {
             user.name = name
+        }
         val password: String? = userDto.password
         val passwordConfirmation: String? = userDto.passwordConfirmation
         if (!password.isNullOrEmpty()) {
             if (passwordConfirmation.isNullOrEmpty()) {
                 messageSourceService.get(code = "password_confirmation_not_provided")
                     .apply { log.error(this) }
-                    .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                        variables = arrayOf(this), statusCode = HttpStatus.BAD_REQUEST) }
+                    .run {
+                        throw ServerException(
+                            omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                            variables = arrayOf(this),
+                            statusCode = HttpStatus.BAD_REQUEST
+                        )
+                    }
             }
             if (passwordConfirmation != password) {
                 messageSourceService.get(code = "password_and_confirmation_not_matched")
                     .apply { log.error(this) }
-                    .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                        variables = arrayOf(this), statusCode = HttpStatus.BAD_REQUEST) }
+                    .run {
+                        throw ServerException(
+                            omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                            variables = arrayOf(this),
+                            statusCode = HttpStatus.BAD_REQUEST
+                        )
+                    }
             }
             user.password = passwordEncoder.encode(password)
         }
         return userService.save(user = user)
-            .run user@ {
+            .run user@{
                 this@user.convertEntityToDto()
             }
     }
@@ -119,29 +143,51 @@ class UserController(
         summary = "All Users",
         tags = ["User"],
         responses = [
-            ApiResponse(responseCode = "200", description = MediaType.APPLICATION_JSON_VALUE,
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserPaginationDTO::class)))),
-            ApiResponse(responseCode = "500", description = "internal server error occurred",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
+            ApiResponse(
+                responseCode = "200",
+                description = MediaType.APPLICATION_JSON_VALUE,
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserPaginationDTO::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
         ],
         security = [SecurityRequirement(name = SECURITY_SCHEME_NAME, scopes = [ADMIN])]
     )
     @Authorize(roles = [ADMIN])
     @GetMapping
     fun allUsers(
-        @Parameter(name = "page", description = "Page number", example = DEFAULT_PAGE_NUMBER) @RequestParam(defaultValue = "1", required = false) page: Int,
-        @Parameter(name = "size", description = "Page size", example = DEFAULT_PAGE_SIZE) @RequestParam(defaultValue = "\${spring.data.web.pageable.default-page-size:10}", required = false) size: Int,
-        @Parameter(name = "sortBy", description = "Sort by column", example = "id") @RequestParam(defaultValue = "id", required = false) sortBy: String,
-        @Parameter(name = "sort", description = "Sort direction", schema = Schema(type = "string", allowableValues = ["asc", "desc"])) @RequestParam(defaultValue = "asc", required = false) @Pattern(regexp = "asc|desc") sort: String,
-        @Parameter(name = "q", description = "Search keyword", example = "lorem") @RequestParam(required = false) q: String?
+        @Parameter(name = "page", description = "Page number", example = DEFAULT_PAGE_NUMBER)
+        @RequestParam(defaultValue = "1", required = false)
+        page: Int,
+        @Parameter(name = "size", description = "Page size", example = DEFAULT_PAGE_SIZE)
+        @RequestParam(defaultValue = "\${spring.data.web.pageable.default-page-size:10}", required = false)
+        size: Int,
+        @Parameter(name = "sortBy", description = "Sort by column", example = "id")
+        @RequestParam(defaultValue = "id", required = false)
+        sortBy: String,
+        @Parameter(name = "sort", description = "Sort direction", schema = Schema(type = "string", allowableValues = ["asc", "desc"]))
+        @RequestParam(defaultValue = "asc", required = false)
+        @Pattern(regexp = "asc|desc")
+        sort: String,
+        @Parameter(name = "q", description = "Search keyword", example = "lorem")
+        @RequestParam(required = false)
+        q: String?
     ): UserPaginationDTO =
         arrayListOf("id", "name", "email")
             .run {
                 if (this.none { it == sortBy }) {
                     messageSourceService.get(code = "invalid_sort_column", params = arrayOf(sortBy))
                         .also { log.error(it) }
-                        .run error@ { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                            variables = arrayOf(this@error), statusCode = HttpStatus.BAD_REQUEST) }
+                        .run error@{
+                            throw ServerException(
+                                omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                                variables = arrayOf(this@error),
+                                statusCode = HttpStatus.BAD_REQUEST
+                            )
+                        }
                 }
                 PaginationCriteria(page = page, size = size)
                     .also { it: PaginationCriteria ->
@@ -149,13 +195,13 @@ class UserController(
                         it.sort = sort
                         it.columns = this
                     }
-                    .run paginationCriteria@ {
+                    .run paginationCriteria@{
                         userService.findAllUsers(
                             specification = userService.createSpecificationForUser(q = q),
                             pageRequest = PageRequestBuilder.build(paginationCriteria = this@paginationCriteria)
                         )
                     }
-                    .run messagePage@ {
+                    .run messagePage@{
                         UserPaginationDTO(
                             pageModel = this@messagePage,
                             items = this@messagePage.content.map { it: User -> it.convertEntityToDto() }.toList(),

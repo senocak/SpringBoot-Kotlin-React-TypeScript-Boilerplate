@@ -25,11 +25,17 @@ class EmailService(
     private val mailConfigurationProperties: MailConfigurationProperties,
     private val templateEngine: SpringTemplateEngine,
     private val messageSourceService: MessageSourceService
-){
+) {
     private val log: Logger by logger()
-    @Value("\${spring.application.name}") private lateinit var appName: String
-    @Value("\${server.port}") private lateinit var port: String
-    @Value("\${app.frontend-url}") private lateinit var frontendUrl: String
+
+    @Value("\${spring.application.name}")
+    private lateinit var appName: String
+
+    @Value("\${server.port}")
+    private lateinit var port: String
+
+    @Value("\${app.frontend-url}")
+    private lateinit var frontendUrl: String
 
     /**
      * Send an e-mail to the specified address.
@@ -61,11 +67,14 @@ class EmailService(
                 .also { it: Context ->
                     it.setVariable("name", user.name)
                     it.setVariable("email", user.email)
-                    it.setVariable("url", "${frontendUrl}/auth/activate-email/${emailActivationToken.token}")
+                    it.setVariable("url", "$frontendUrl/auth/activate-email/${emailActivationToken.token}")
                     it.setVariable("token", emailActivationToken.token)
                 }
-            send(to = InternetAddress(user.email, user.name), subject = messageSourceService.get(code = "email_activation"),
-                text = templateEngine.process("mail/user-email-activation", ctx))
+            send(
+                to = InternetAddress(user.email, user.name),
+                subject = messageSourceService.get(code = "email_activation"),
+                text = templateEngine.process("mail/user-email-activation", ctx)
+            )
             log.info("[EmailService] Sent activation e-mail: ${user.id} - ${user.email} - ${emailActivationToken.token}")
         } catch (e: Exception) {
             log.error("[EmailService] Failed to send activation e-mail: ${e.message}")
@@ -84,11 +93,14 @@ class EmailService(
                 .also { it: Context ->
                     it.setVariable("name", user.name)
                     it.setVariable("email", user.email)
-                    it.setVariable("url", "${frontendUrl}/auth/change-password/${token}")
+                    it.setVariable("url", "$frontendUrl/auth/change-password/$token")
                     it.setVariable("token", token)
                 }
-            send(to = InternetAddress(user.email, user.name), subject = messageSourceService.get(code = "password_change"),
-                text = templateEngine.process("mail/reset-password", ctx))
+            send(
+                to = InternetAddress(user.email, user.name),
+                subject = messageSourceService.get(code = "password_change"),
+                text = templateEngine.process("mail/reset-password", ctx)
+            )
             log.info("[EmailService] Sent password reset e-mail: ${user.id} - ${user.email} - $token")
         } catch (e: Exception) {
             log.error("[EmailService] Failed to send password reset e-mail: ${e.message}")
@@ -107,8 +119,11 @@ class EmailService(
                     it.setVariable("name", user.name)
                     it.setVariable("email", user.email)
                 }
-            send(to = InternetAddress(user.email, user.name), subject = messageSourceService.get(code = "password_changed_success"),
-                text = templateEngine.process("mail/password-changed-success.html", ctx))
+            send(
+                to = InternetAddress(user.email, user.name),
+                subject = messageSourceService.get(code = "password_changed_success"),
+                text = templateEngine.process("mail/password-changed-success.html", ctx)
+            )
             log.info("[EmailService] Sent change password e-mail: ${user.id} - ${user.email}")
         } catch (e: Exception) {
             log.error("[EmailService] Failed to send change password e-mail: ${e.message}")
@@ -137,5 +152,4 @@ class EmailService(
         get() =
             Context(LocaleContextHolder.getLocale())
                 .apply { this.setVariable("APP_NAME", appName) }
-
 }

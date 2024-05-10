@@ -12,7 +12,6 @@ import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.info.License
 import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.servers.Server
-import java.util.Locale
 import org.slf4j.Logger
 import org.springdoc.core.models.GroupedOpenApi
 import org.springframework.beans.factory.annotation.Value
@@ -32,13 +31,14 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.i18n.SessionLocaleResolver
+import java.util.Locale
 
 @EnableAsync
 @EnableScheduling
 @Configuration
 class AppConfig(
     private val authorizationInterceptor: AuthorizationInterceptor
-): WebMvcConfigurer {
+) : WebMvcConfigurer {
     private val log: Logger by logger()
 
     override fun configureAsyncSupport(configurer: AsyncSupportConfigurer) {
@@ -53,9 +53,11 @@ class AppConfig(
         configurer
             .setDefaultTimeout(120_000)
             .setTaskExecutor(executor)
-        log.info("Core pool size: ${executor.corePoolSize}, max pool size: ${executor.maxPoolSize}," +
+        log.info(
+            "Core pool size: ${executor.corePoolSize}, max pool size: ${executor.maxPoolSize}," +
                 "keepAliveSeconds: ${executor.keepAliveSeconds}, queueCapacity: ${executor.queueCapacity}," +
-                "queueSize: ${executor.queueSize}")
+                "queueSize: ${executor.queueSize}"
+        )
     }
 
     override fun addViewControllers(registry: ViewControllerRegistry) {

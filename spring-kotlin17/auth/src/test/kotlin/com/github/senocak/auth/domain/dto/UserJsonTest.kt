@@ -26,7 +26,7 @@ class UserJsonTest {
     fun serializeJson() {
         assertThat(asJson).hasEmptyJsonPathValue("id")
         assertThat(asJson).extractingJsonPathStringValue("name").isEqualTo("anil")
-        assertThat(asJson).hasJsonPathStringValue("createdAt");
+        assertThat(asJson).hasJsonPathStringValue("createdAt")
         assertThat(asJson).hasJsonPathStringValue("updatedAt")
         assertThat(asJson).hasJsonPathArrayValue("roles")
         assertThat(asJson).doesNotHaveJsonPath("not_exist_field")
@@ -34,11 +34,11 @@ class UserJsonTest {
 
     @Test
     fun deserializeJson() {
-        val dtoString = "{\"name\":\"anil\",\"email\":\"anil@senocak.com\",\"password\":\"password\",\"roles\":[],\"id\":null,\"createdAt\":\"2022-12-19T11:09:55.150+00:00\",\"updatedAt\":\"2022-12-19T11:09:55.150+00:00\"}";
+        val dtoString = "{\"name\":\"anil\",\"email\":\"anil@senocak.com\",\"password\":\"password\",\"roles\":[],\"id\":null,\"createdAt\":\"2022-12-19T11:09:55.150+00:00\",\"updatedAt\":\"2022-12-19T11:09:55.150+00:00\"}"
         val dto: User = jackson.parseObject(dtoString)
         assertThat(dto.id).isNull()
         assertThat(dto.name).isEqualTo("anil")
-        //assertEquals("anil", dto.name);
+        // assertEquals("anil", dto.name);
         assertThat(dto.email).isEqualTo("anil@senocak.com")
         assertThat(dto.password).isEqualTo("password")
         assertThat(dto.roles).isEmpty()

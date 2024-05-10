@@ -6,13 +6,13 @@ import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.exception.ServerException
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.randomStringGenerator
-import java.time.Instant
-import java.util.Date
-import java.util.UUID
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+import java.util.Date
+import java.util.UUID
 
 @Service
 class EmailActivationTokenService(
@@ -36,19 +36,25 @@ class EmailActivationTokenService(
      * @return EmailActivationToken
      */
     fun create(user: User): EmailActivationToken =
-        EmailActivationToken(user = user, token = 15.randomStringGenerator() )
+        EmailActivationToken(user = user, token = 15.randomStringGenerator())
             .also { it.expirationDate = Date.from(Instant.now().plusSeconds(expiresIn)) }
             .run { emailActivationTokenRepository.save(this) }
 
     fun findByUser(user: User): EmailActivationToken =
         emailActivationTokenRepository.findByUser(user = user)
-            ?: throw ServerException(omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
-                statusCode = HttpStatus.NOT_FOUND, variables = arrayOf(messageSourceService.get(code = "activation_token_not_found")))
+            ?: throw ServerException(
+                omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
+                statusCode = HttpStatus.NOT_FOUND,
+                variables = arrayOf(messageSourceService.get(code = "activation_token_not_found"))
+            )
 
     fun findByToken(token: String): EmailActivationToken =
         emailActivationTokenRepository.findByToken(token = token)
-            ?: throw ServerException(omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
-                statusCode = HttpStatus.NOT_FOUND, variables = arrayOf(messageSourceService.get(code = "activation_token_not_found")))
+            ?: throw ServerException(
+                omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
+                statusCode = HttpStatus.NOT_FOUND,
+                variables = arrayOf(messageSourceService.get(code = "activation_token_not_found"))
+            )
 
     /**
      * Get email activation token by token.
@@ -59,8 +65,11 @@ class EmailActivationTokenService(
         findByToken(token = token)
             .apply {
                 if (isRegistrationTokenExpired(token = this)) {
-                    throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                        statusCode = HttpStatus.BAD_REQUEST, variables = arrayOf(messageSourceService.get(code = "registration_token_expired")))
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                        statusCode = HttpStatus.BAD_REQUEST,
+                        variables = arrayOf(messageSourceService.get(code = "registration_token_expired"))
+                    )
                 }
             }
             .run { this.user!! }

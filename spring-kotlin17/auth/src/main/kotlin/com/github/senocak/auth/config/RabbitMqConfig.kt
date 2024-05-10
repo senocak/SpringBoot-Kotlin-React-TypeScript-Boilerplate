@@ -22,7 +22,7 @@ class RabbitMqConfig(
     @Value("\${app.rabbitmq.EXCHANGE}") private val exchange: String,
     @Value("\${app.rabbitmq.QUEUE}") private val queue: String,
     @Value("\${app.rabbitmq.ROUTING_KEY}") private val routingKey: String
-){
+) {
 
     /**
      * @return the queue

@@ -5,12 +5,12 @@ import com.github.senocak.auth.domain.Role
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.dto.RoleResponse
 import com.github.senocak.auth.domain.dto.UserResponse
-import java.text.Normalizer
-import java.util.Date
-import java.util.regex.Pattern
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.util.StringUtils
+import java.text.Normalizer
+import java.util.Date
+import java.util.regex.Pattern
 
 /**
  * @return -- UserResponse object
@@ -80,11 +80,12 @@ fun String.getQueryParams(): Map<String, String>? {
         this.isEmpty() -> null
         else -> {
             val split: Array<String>? = this.split(delimiter = "&")
-            if (!split.isNullOrEmpty())
+            if (!split.isNullOrEmpty()) {
                 for (param: String in split) {
                     val paramArray: Array<String>? = param.split(delimiter = "=")
                     queryParams[paramArray!![0]] = paramArray[1]
-                } else {
+                }
+            } else {
                 val paramArray: Array<String>? = this.split(delimiter = "=")
                 queryParams[paramArray!![0]] = paramArray[1]
             }

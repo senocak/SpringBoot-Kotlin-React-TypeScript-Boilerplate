@@ -9,9 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 
-@DataJpaTest
-@ActiveProfiles(value = ["datajpa-test"])
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 /*
 @TestPropertySource(properties = [
     "spring.datasource.url=jdbc:tc:mysql:8.0.1://localhost/spring?TC_INITSCRIPT=file:src/test/resources/db.sql",
@@ -21,15 +18,19 @@ import org.springframework.test.context.ActiveProfiles
     "spring.jpa.hibernate.ddl-auto=validate"
 ])
 */
+@DataJpaTest
+@ActiveProfiles(value = ["datajpa-test"])
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserDataJpaTest {
     @Autowired private lateinit var userRepository: UserRepository
+
     @Autowired private lateinit var jdbcTemplate: JdbcTemplate
 
+    // @Sql("/db.sql")
     @Test
-    //@Sql("/db.sql")
     fun whenInjectInMemoryDataSource_thenReturnCorrectEmployeeCount() {
-        //userRepository.save(User("name1","username1","email@email1.com","password1"))
-        assertEquals(3,userRepository.findAll().count())
+        // userRepository.save(User("name1","username1","email@email1.com","password1"))
+        assertEquals(3, userRepository.findAll().count())
 
         val queryForList = jdbcTemplate.queryForList("select * from users")
         assertEquals(3, queryForList.size)

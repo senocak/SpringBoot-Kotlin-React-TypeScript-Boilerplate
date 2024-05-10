@@ -5,8 +5,8 @@ import com.github.senocak.auth.util.logger
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
-import kotlin.reflect.KClass
 import org.slf4j.Logger
+import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

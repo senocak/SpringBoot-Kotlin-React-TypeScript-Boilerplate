@@ -19,12 +19,6 @@ import jakarta.persistence.Table
 import jakarta.persistence.Temporal
 import jakarta.persistence.TemporalType
 import jakarta.persistence.UniqueConstraint
-import java.io.Serializable
-import java.time.LocalDateTime
-import java.util.Date
-import java.util.Objects
-import java.util.UUID
-import java.util.concurrent.TimeUnit
 import org.hibernate.Hibernate
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.OnDelete
@@ -32,33 +26,42 @@ import org.hibernate.annotations.OnDeleteAction
 import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.TimeToLive
 import org.springframework.data.redis.core.index.Indexed
+import java.io.Serializable
+import java.util.Date
+import java.util.Objects
+import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 @MappedSuperclass
 open class BaseDomain(
-        @Id
-        @GeneratedValue(generator = "UUID")
-        @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-        @Column(name = "id", updatable = false, nullable = false)
-        var id: UUID? = null,
-        @Column var createdAt: Date = Date(),
-        @Column var updatedAt: Date = Date()
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false)
+    var id: UUID? = null,
+    @Column var createdAt: Date = Date(),
+    @Column var updatedAt: Date = Date()
 ) : Serializable {
     @PrePersist
     protected open fun prePersist() {
-        //id = UUID.randomUUID()
+        // id = UUID.randomUUID()
     }
 }
 
 @Entity
-@Table(name = "users", uniqueConstraints = [
-    UniqueConstraint(columnNames = ["email"])
-])
+@Table(
+    name = "users",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["email"])
+    ]
+)
 data class User(
-        @Column var name: String? = null,
-        @Column var email: String? = null,
-        @Column var password: String? = null
+    @Column var name: String? = null,
+    @Column var email: String? = null,
+    @Column var password: String? = null
 ) : BaseDomain() {
-    @JoinTable(name = "user_roles",
+    @JoinTable(
+        name = "user_roles",
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
@@ -75,7 +78,9 @@ data class User(
 @Entity
 @Table(name = "roles")
 data class Role(
-    @Column @Enumerated(EnumType.STRING) var name: RoleName? = null
+    @Column
+    @Enumerated(EnumType.STRING)
+    var name: RoleName? = null
 ) : BaseDomain()
 
 @Entity
@@ -96,7 +101,7 @@ data class EmailActivationToken(
 
     @Column(nullable = false, length = 64)
     var token: String? = null
-): BaseDomain() {
+) : BaseDomain() {
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     var expirationDate: Date = Date()
@@ -115,7 +120,7 @@ data class EmailActivationToken(
 }
 
 @RedisHash(value = "jwtTokens")
-data class JwtToken (
+data class JwtToken(
     @org.springframework.data.annotation.Id
     @Indexed
     val token: String,

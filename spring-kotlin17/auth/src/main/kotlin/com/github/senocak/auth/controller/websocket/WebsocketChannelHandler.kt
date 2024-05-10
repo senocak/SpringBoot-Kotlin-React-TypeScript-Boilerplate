@@ -9,8 +9,6 @@ import com.github.senocak.auth.service.WebSocketCacheService
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.getQueryParams
 import com.github.senocak.auth.util.logger
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import org.slf4j.Logger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -23,13 +21,15 @@ import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.AbstractWebSocketHandler
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 @Controller
 class WebsocketChannelHandler(
     private val webSocketCacheService: WebSocketCacheService,
     private val jwtTokenProvider: JwtTokenProvider,
     private val objectMapper: ObjectMapper
-): AbstractWebSocketHandler() {
+) : AbstractWebSocketHandler() {
     private val log: Logger by logger()
     private val lock = ReentrantLock(true)
 
@@ -41,8 +41,9 @@ class WebsocketChannelHandler(
         lock.withLock {
             runCatching {
                 log.info("Websocket connection established. Path: ${session.uri!!.path}")
-                if (session.uri == null)
+                if (session.uri == null) {
                     log.error("Unable to retrieve the websocket session; serious error!").also { return }
+                }
                 val (email: String, token: String) = getUserEmailAndAccessTokenFromQueryParams(query = session.uri!!.query)
                 WebsocketIdentifier(user = email, token = token, session = session)
                     .also { log.info("Websocket session established: $it") }
@@ -61,8 +62,9 @@ class WebsocketChannelHandler(
         lock.withLock {
             log.info("Websocket connection closed. Path: ${session.uri!!.path}")
             runCatching {
-                if (session.uri == null)
+                if (session.uri == null) {
                     log.error("Unable to retrieve the websocket session; serious error!").also { return }
+                }
                 val (email: String, _: String) = getUserEmailAndAccessTokenFromQueryParams(query = session.uri!!.query)
                 webSocketCacheService.deleteSession(key = email)
                     .also { log.info("Websocket for $email has been closed") }
@@ -95,7 +97,7 @@ class WebsocketChannelHandler(
         }
     }
 
-    private fun getUserEmailAndAccessTokenFromQueryParams(query: String): Pair<String, String>  {
+    private fun getUserEmailAndAccessTokenFromQueryParams(query: String): Pair<String, String> {
         val queryParams: Map<String, String> = query.getQueryParams() ?: throw Exception("QueryParams can not be empty")
         val accessToken: String = queryParams["access_token"] ?: throw Exception("Auth can not be empty")
         return Pair(first = jwtTokenProvider.getUserEmailFromJWT(token = accessToken), second = accessToken)
@@ -107,12 +109,16 @@ class WebsocketChannelHandler(
                 return when {
                     !this.isNullOrEmpty() -> {
                         var first: String = this.first()
-                        if (first.startsWith(prefix = "Bearer "))
+                        if (first.startsWith(prefix = "Bearer ")) {
                             first = first.substring(startIndex = 7)
+                        }
                         Pair(first = jwtTokenProvider.getUserEmailFromJWT(token = first), second = first)
                     }
-                    else -> throw ServerException(omaErrorMessageType = OmaErrorMessageType.GENERIC_SERVICE_ERROR,
-                        variables = arrayOf("token is invalid"), statusCode = HttpStatus.INTERNAL_SERVER_ERROR)
+                    else -> throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.GENERIC_SERVICE_ERROR,
+                        variables = arrayOf("token is invalid"),
+                        statusCode = HttpStatus.INTERNAL_SERVER_ERROR
+                    )
                 }
             }
 }

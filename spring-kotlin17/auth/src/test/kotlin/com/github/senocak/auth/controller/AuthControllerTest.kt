@@ -23,7 +23,6 @@ import com.github.senocak.auth.service.UserService
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.RoleName
 import jakarta.servlet.http.HttpServletRequest
-import java.util.Date
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -40,8 +39,8 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate
 import org.springframework.context.ApplicationEventPublisher
@@ -52,6 +51,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.BindingResult
+import java.util.Date
 
 @Tag("unit")
 @ExtendWith(MockitoExtension::class)
@@ -96,6 +96,7 @@ class AuthControllerTest {
     @Nested
     internal inner class LoginTest {
         private val loginRequest: LoginRequest = LoginRequest(email = USER_EMAIL, password = USER_PASSWORD)
+
         @BeforeEach
         fun setup() {
             loginRequest.email = USER_NAME

@@ -2,10 +2,6 @@ package com.github.senocak.auth.controller
 
 import com.github.senocak.auth.util.changeLevel
 import com.sun.management.OperatingSystemMXBean
-import java.lang.management.ManagementFactory
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.util.Date
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.graphql.data.method.annotation.Argument
@@ -15,6 +11,10 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
+import java.lang.management.ManagementFactory
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @RestController
 class GraphQLController {
@@ -93,6 +93,6 @@ class GraphQLController {
         var availableProcessors: Int = 0,
         var totalMemory: String = "",
         var maxMemory: String = "",
-        var freeMemory: String = "",
+        var freeMemory: String = ""
     )
 }

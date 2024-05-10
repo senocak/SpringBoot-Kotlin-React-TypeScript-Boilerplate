@@ -10,7 +10,6 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import java.io.IOException
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Qualifier
@@ -29,6 +28,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+import java.io.IOException
 
 /**
  * Filter class that aims to guarantee a single execution per request dispatch, on any servlet container.
@@ -43,7 +43,7 @@ class JwtAuthenticationFilter(
     private val restExceptionHandler: RestExceptionHandler,
     @Qualifier("requestMappingHandlerMapping")
     private val requestHandlerMapping: RequestMappingHandlerMapping
-): OncePerRequestFilter(), SmartLifecycle {
+) : OncePerRequestFilter(), SmartLifecycle {
     private val log: Logger by logger()
     private var running: Boolean = false
     private val protectedEndpoints: HashMap<String, MutableList<String>> =
@@ -80,7 +80,10 @@ class JwtAuthenticationFilter(
                 val email: String = tokenProvider.getUserEmailFromJWT(token = jwt)
                 val userDetails: UserDetails = userService.loadUserByUsername(email = email)
                 UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.authorities)
+                    userDetails,
+                    null,
+                    userDetails.authorities
+                )
                     .also { it.details = WebAuthenticationDetailsSource().buildDetails(request) }
                     .also { authenticationManager.authenticate(it) }
                     .also { log.trace("SecurityContext created") }
@@ -95,10 +98,14 @@ class JwtAuthenticationFilter(
         }
         response.setHeader("Access-Control-Allow-Origin", "*")
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
-        response.setHeader("Access-Control-Allow-Headers",
-            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-        response.setHeader("Access-Control-Expose-Headers",
-            "Content-Type, Access-Control-Expose-Headers, Authorization, X-Requested-With")
+        response.setHeader(
+            "Access-Control-Allow-Headers",
+            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+        )
+        response.setHeader(
+            "Access-Control-Expose-Headers",
+            "Content-Type, Access-Control-Expose-Headers, Authorization, X-Requested-With"
+        )
         filterChain.doFilter(request, response)
         log.trace("Filtering accessed for remote address: ${request.remoteAddr}")
     }
@@ -123,8 +130,9 @@ class JwtAuthenticationFilter(
                         if (
                             handlerMethod.method.declaringClass.isAnnotationPresent(Authorize::class.java) ||
                             handlerMethod.hasMethodAnnotation(Authorize::class.java)
-                        )
+                        ) {
                             protectedEndpoints[method.asHttpMethod().name()]?.addAll(elements = requestInfo.pathPatternsCondition!!.patternValues)
+                        }
                 }
             }
     }

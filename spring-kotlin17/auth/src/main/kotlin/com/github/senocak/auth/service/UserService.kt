@@ -15,8 +15,6 @@ import jakarta.persistence.criteria.CriteriaBuilder
 import jakarta.persistence.criteria.CriteriaQuery
 import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
-import java.util.Date
-import java.util.UUID
 import org.slf4j.Logger
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -31,6 +29,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.Date
+import java.util.UUID
 
 @Service
 class UserService(
@@ -41,7 +41,7 @@ class UserService(
     private val emailService: EmailService,
     private val passwordEncoder: PasswordEncoder,
     private val jdbcTemplate: JdbcTemplate
-): UserDetailsService {
+) : UserDetailsService {
     private val log: Logger by logger()
 
     fun findAllUsers(specification: Specification<User>, pageRequest: Pageable): Page<User> =
@@ -132,8 +132,13 @@ class UserService(
         if (byUserId != null) {
             messageSourceService.get(code = "password_reset_token_exist")
                 .apply { log.error(this) }
-                .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                    statusCode = HttpStatus.CONFLICT, variables = arrayOf(this)) }
+                .run {
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                        statusCode = HttpStatus.CONFLICT,
+                        variables = arrayOf(this)
+                    )
+                }
         }
         val token: String = 50.randomStringGenerator()
         PasswordResetToken(token = token, userId = user.id!!)
@@ -148,29 +153,52 @@ class UserService(
      */
     fun changePassword(request: ChangePasswordRequest, token: String) {
         val passwordResetToken: PasswordResetToken = passwordResetTokenRepository.findByToken(token = token)
-             ?: messageSourceService.get(code = "password_reset_token_expired", params = arrayOf(token))
-                 .apply { log.error(this) }
-                 .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
-                     statusCode = HttpStatus.NOT_FOUND, variables = arrayOf(this)) }
+            ?: messageSourceService.get(code = "password_reset_token_expired", params = arrayOf(token))
+                .apply { log.error(this) }
+                .run {
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
+                        statusCode = HttpStatus.NOT_FOUND,
+                        variables = arrayOf(this)
+                    )
+                }
 
         var user: User = findByEmail(email = request.email)
-        if (passwordResetToken.userId != user.id)
+        if (passwordResetToken.userId != user.id) {
             messageSourceService.get(code = "invalid_token_for_mail")
                 .apply { log.error(this) }
-                .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                    statusCode = HttpStatus.BAD_REQUEST, variables = arrayOf(this)) }
+                .run {
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                        statusCode = HttpStatus.BAD_REQUEST,
+                        variables = arrayOf(this)
+                    )
+                }
+        }
 
-        if (request.password != request.passwordConfirmation)
+        if (request.password != request.passwordConfirmation) {
             messageSourceService.get(code = "password_mismatch")
                 .apply { log.error(this) }
-                .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                    statusCode = HttpStatus.BAD_REQUEST, variables = arrayOf(this)) }
+                .run {
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                        statusCode = HttpStatus.BAD_REQUEST,
+                        variables = arrayOf(this)
+                    )
+                }
+        }
 
-        if (passwordEncoder.matches(request.password, user.password))
+        if (passwordEncoder.matches(request.password, user.password)) {
             messageSourceService.get(code = "new_password_must_be_different_from_old")
                 .apply { log.error(this) }
-                .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                    statusCode = HttpStatus.CONFLICT, variables = arrayOf(this)) }
+                .run {
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                        statusCode = HttpStatus.CONFLICT,
+                        variables = arrayOf(this)
+                    )
+                }
+        }
         user.password = passwordEncoder.encode(request.password)
         user = userRepository.save(user)
         passwordResetTokenRepository.delete(passwordResetToken)

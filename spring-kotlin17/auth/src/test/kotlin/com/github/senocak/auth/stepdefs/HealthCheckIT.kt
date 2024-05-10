@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatusCode
 @CucumberStepsDefinition
 class HealthCheckIT(
     @LocalServerPort private var localServerPort: Int
-){
+) {
     private val stepCommon = SpringIntegrationUtil(randomPort = localServerPort)
 
     @Given("^the client calls '([^\"]*)'")

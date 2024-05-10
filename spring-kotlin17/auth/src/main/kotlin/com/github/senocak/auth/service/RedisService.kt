@@ -11,7 +11,7 @@ import redis.clients.jedis.JedisPubSub
 @Service
 class RedisService(
     private val redisConfig: RedisConfig
-){
+) {
     private val log: Logger by logger()
 
     @Throws(ConfigException::class)
@@ -209,7 +209,9 @@ class RedisService(
             val jedisPool = redisConfig.jedisPool
             log.debug(
                 "Get new jedis resource from pool. Current pool stats: Active= {} Idle= {} Waiters= {} ",
-                jedisPool!!.numActive, jedisPool.numIdle, jedisPool.numWaiters
+                jedisPool!!.numActive,
+                jedisPool.numIdle,
+                jedisPool.numWaiters
             )
             return jedisPool.resource
         }

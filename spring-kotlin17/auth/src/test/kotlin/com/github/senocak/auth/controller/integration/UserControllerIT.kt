@@ -106,17 +106,21 @@ class UserControllerIT {
                 .andExpect(jsonPath("$.exception.error.id", equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)))
                 .andExpect(jsonPath("$.exception.error.text", equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)))
                 .andExpect(jsonPath("$.exception.variables", hasSize<Any>(4)))
-                .andExpect(jsonPath("$.exception.variables",
-                    Matchers.containsInAnyOrder(
-                        "password: Password must be 6 or more characters in length.\n" +
+                .andExpect(
+                    jsonPath(
+                        "$.exception.variables",
+                        Matchers.containsInAnyOrder(
+                            "password: Password must be 6 or more characters in length.\n" +
                                 "Password must contain 1 or more uppercase characters.\n" +
                                 "Password must contain 1 or more special characters.",
-                        "passwordConfirmation: Password must be 6 or more characters in length.\n" +
+                            "passwordConfirmation: Password must be 6 or more characters in length.\n" +
                                 "Password must contain 1 or more uppercase characters.\n" +
                                 "Password must contain 1 or more special characters.",
-                        "name: size must be between 4 and 40",
-                        "Passwords don't match"
-                    )))
+                            "name: size must be between 4 and 40",
+                            "Passwords don't match"
+                        )
+                    )
+                )
         }
 
         @Test
@@ -191,8 +195,12 @@ class UserControllerIT {
                 .andExpect(jsonPath("$.exception.error.id", equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)))
                 .andExpect(jsonPath("$.exception.error.text", equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)))
                 .andExpect(jsonPath("$.exception.variables", hasSize<Any>(1)))
-                .andExpect(jsonPath("$.exception.variables",
-                    Matchers.containsInAnyOrder("Invalid sort column: invalid")))
+                .andExpect(
+                    jsonPath(
+                        "$.exception.variables",
+                        Matchers.containsInAnyOrder("Invalid sort column: invalid")
+                    )
+                )
         }
 
         @Test

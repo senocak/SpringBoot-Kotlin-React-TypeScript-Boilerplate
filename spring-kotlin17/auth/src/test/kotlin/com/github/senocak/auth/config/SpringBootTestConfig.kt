@@ -22,13 +22,15 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles(value = ["integration-test"])
 @TestClassOrder(ClassOrderer.OrderAnnotation::class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-//@Import(TestConfig::class)
+// @Import(TestConfig::class)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@ContextConfiguration(initializers = [
-    PostgresqlInitializer::class,
-    RabbitMqInitializer::class,
-    RedisInitializer::class
-])
-//@TestPropertySource({"/application-integration-test.yml" })
-//@TestPropertySource(properties = ["spring.autoconfigure.exclude=graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration"])
+@ContextConfiguration(
+    initializers = [
+        PostgresqlInitializer::class,
+        RabbitMqInitializer::class,
+        RedisInitializer::class
+    ]
+)
+// @TestPropertySource({"/application-integration-test.yml" })
+// @TestPropertySource(properties = ["spring.autoconfigure.exclude=graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration"])
 annotation class SpringBootTestConfig

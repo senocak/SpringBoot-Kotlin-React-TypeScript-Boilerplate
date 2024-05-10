@@ -2,9 +2,12 @@ package com.github.senocak.auth.security
 
 import com.github.senocak.auth.service.AuthenticationService
 import com.github.senocak.auth.util.logger
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
 import org.springframework.core.DefaultParameterNameDiscoverer
+import org.springframework.core.MethodParameter
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.stereotype.Component
@@ -14,14 +17,11 @@ import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.AsyncHandlerInterceptor
 import java.security.InvalidParameterException
 import java.util.Collections
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import org.springframework.core.MethodParameter
 
 @Component
 class AuthorizationInterceptor(
     private val authenticationService: AuthenticationService
-): AsyncHandlerInterceptor {
+) : AsyncHandlerInterceptor {
     private val log: Logger by logger()
 
     /**
@@ -58,9 +58,9 @@ class AuthorizationInterceptor(
         for (methodParameter: MethodParameter in methodParameters) {
             val requestParam: RequestParam? = methodParameter.getParameterAnnotation(RequestParam::class.java)
             if (requestParam != null) {
-                if (StringUtils.hasText(requestParam.name))
+                if (StringUtils.hasText(requestParam.name)) {
                     expectedParams.add(element = requestParam.name)
-                else {
+                } else {
                     methodParameter.initParameterNameDiscovery(DefaultParameterNameDiscoverer())
                     expectedParams.add(element = methodParameter.parameterName!!)
                 }
@@ -69,7 +69,7 @@ class AuthorizationInterceptor(
         queryParams.removeAll(elements = expectedParams)
         if (queryParams.isNotEmpty()) {
             throw InvalidParameterException("unexpected parameter: $queryParams")
-                    .also { log.error("Unexpected parameters: $queryParams") }
+                .also { log.error("Unexpected parameters: $queryParams") }
         }
     }
 

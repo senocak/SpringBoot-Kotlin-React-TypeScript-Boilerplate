@@ -34,7 +34,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import io.swagger.v3.oas.annotations.parameters.RequestBody as RequestBodySchema
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.constraints.Email
 import org.slf4j.Logger
@@ -55,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.parameters.RequestBody as RequestBodySchema
 
 @Validated
 @RestController
@@ -72,21 +72,31 @@ class AuthController(
     @Value("\${app.jwtExpirationInMs}") private val jwtExpirationInMs: Long,
     @Value("\${app.refreshExpirationInMs}") private val refreshExpirationInMs: Long,
     @Value("\${app.rabbitmq.QUEUE}") private val queue: String,
-    private val jacksonObjectMapper: ObjectMapper,
-): BaseController() {
+    private val jacksonObjectMapper: ObjectMapper
+) : BaseController() {
     private val log: Logger by logger()
 
     @PostMapping("/login")
     @Operation(summary = "Login Endpoint", tags = ["Authentication"])
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "201", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))),
-            ApiResponse(responseCode = "500", description = "internal server error occurred",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "201",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     @Counted
     @Throws(ServerException::class)
     fun login(
@@ -97,12 +107,17 @@ class AuthController(
             .run { authenticationManager.authenticate(UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password)) }
             .run { userService.findByEmail(email = loginRequest.email) }
             .apply {
-                if (this.emailActivatedAt == null)
+                if (this.emailActivatedAt == null) {
                     messageSourceService.get(code = "email_not_activated")
                         .also { msg: String ->
                             log.error(msg)
-                            throw ServerException(omaErrorMessageType = OmaErrorMessageType.UNAUTHORIZED,
-                                statusCode = HttpStatus.UNAUTHORIZED, variables = arrayOf(msg)) }
+                            throw ServerException(
+                                omaErrorMessageType = OmaErrorMessageType.UNAUTHORIZED,
+                                statusCode = HttpStatus.UNAUTHORIZED,
+                                variables = arrayOf(msg)
+                            )
+                        }
+                }
             }
             .run {
                 val generateUserWrapperResponse = generateUserWrapperResponse(user = this)
@@ -121,13 +136,23 @@ class AuthController(
         summary = "Register Endpoint",
         tags = ["Authentication"],
         responses = [
-            ApiResponse(responseCode = "200", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))),
-            ApiResponse(responseCode = "500", description = "internal server error occurred",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "200",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     @ResponseStatus(code = HttpStatus.CREATED)
     @Throws(ServerException::class)
     fun register(
@@ -135,10 +160,11 @@ class AuthController(
         resultOfValidation: BindingResult
     ): Map<String, String> {
         validate(resultOfValidation = resultOfValidation)
-        if (userService.existsByEmail(email = signUpRequest.email))
+        if (userService.existsByEmail(email = signUpRequest.email)) {
             messageSourceService.get(code = "unique_email").plus(other = ": ${signUpRequest.email}")
                 .apply { log.error(this) }
                 .run { throw ServerException(omaErrorMessageType = OmaErrorMessageType.JSON_SCHEMA_VALIDATOR, variables = arrayOf(this)) }
+        }
         val user: User = User(name = signUpRequest.name, email = signUpRequest.email, password = passwordEncoder.encode(signUpRequest.password))
             .also { it.roles = listOf(element = roleService.findByName(roleName = RoleName.ROLE_USER)) }
         val result: User = userService.save(user = user)
@@ -153,13 +179,23 @@ class AuthController(
         summary = "Refresh Token Endpoint",
         tags = ["Authentication"],
         responses = [
-            ApiResponse(responseCode = "201", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))),
-            ApiResponse(responseCode = "500", description = "internal server error occurred",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "201",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     @Throws(ServerException::class)
     fun refresh(
         @Parameter(description = "Request body to refreshing token", required = true) @Validated @RequestBody refreshTokenRequest: RefreshTokenRequest,
@@ -167,15 +203,19 @@ class AuthController(
     ): UserWrapperResponse {
         validate(resultOfValidation = resultOfValidation)
         val userInfoCache: JwtToken = tokenProvider.findByTokenAndThrowException(token = refreshTokenRequest.token)
-        if (userInfoCache.tokenType != "refresh")
+        if (userInfoCache.tokenType != "refresh") {
             messageSourceService.get(code = "refresh_not_jwt")
                 .apply { log.error(this) }
                 .run {
-                    throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                        variables = arrayOf(this), statusCode = HttpStatus.BAD_REQUEST)
+                    throw ServerException(
+                        omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                        variables = arrayOf(this),
+                        statusCode = HttpStatus.BAD_REQUEST
+                    )
                 }
+        }
         val user: User = userService.findByEmail(email = userInfoCache.email)
-           .also { tokenProvider.markLogoutEventForToken(email = it.email!!) }
+            .also { tokenProvider.markLogoutEventForToken(email = it.email!!) }
         return generateUserWrapperResponse(user = user)
     }
 
@@ -184,11 +224,18 @@ class AuthController(
         summary = "E-mail Activation Endpoint",
         tags = ["Authentication"],
         responses = [
-            ApiResponse(responseCode = "200", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))),
-            ApiResponse(responseCode = "401", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "200",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))
+            ),
+            ApiResponse(
+                responseCode = "401",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     fun activateEmail(
         @Parameter(description = "token variable", required = true, `in` = ParameterIn.PATH) @PathVariable token: String
     ): Map<String, String> =
@@ -200,13 +247,23 @@ class AuthController(
         summary = "Resend E-mail Activation Endpoint",
         tags = ["Authentication"],
         responses = [
-            ApiResponse(responseCode = "200", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "200",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     fun resendEmailActivation(
-        @Parameter(description = "Email", required = true, `in` = ParameterIn.PATH) @PathVariable @Email(message = "{invalid_email}") email: String
+        @Parameter(description = "Email", required = true, `in` = ParameterIn.PATH)
+        @PathVariable
+        @Email(message = "{invalid_email}")
+        email: String
     ): Map<String, String> =
         userService.findByEmail(email = email)
             .also { user: User ->
@@ -214,8 +271,11 @@ class AuthController(
                     messageSourceService.get(code = "this_email_already_activated")
                         .also { msg: String -> log.error(msg) }
                         .run {
-                            throw ServerException(omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
-                                statusCode = HttpStatus.BAD_REQUEST, variables = arrayOf(this))
+                            throw ServerException(
+                                omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
+                                statusCode = HttpStatus.BAD_REQUEST,
+                                variables = arrayOf(this)
+                            )
                         }
                 }
             }
@@ -227,13 +287,23 @@ class AuthController(
     @Operation(
         summary = "Reset Password Endpoint",
         responses = [
-            ApiResponse(responseCode = "200", description = "Successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "200",
+                description = "Successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     fun resetPassword(
-        @Parameter(description = "Email", required = true, `in` = ParameterIn.PATH) @PathVariable @Email(message = "{invalid_email}") email: String
+        @Parameter(description = "Email", required = true, `in` = ParameterIn.PATH)
+        @PathVariable
+        @Email(message = "{invalid_email}")
+        email: String
     ): Map<String, String> =
         userService.passwordReset(email = email)
             .run { mapOf("message" to messageSourceService.get(code = "password_reset_link_sent")) }
@@ -242,14 +312,23 @@ class AuthController(
     @Operation(
         summary = "Change Password Endpoint",
         responses = [
-            ApiResponse(responseCode = "200", description = "Successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "200",
+                description = "Successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = Map::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     fun changePassword(
         @RequestBodySchema(description = "Request body to change password", required = true, content = [Content(mediaType = MediaType.APPLICATION_JSON_VALUE)])
-        @RequestBody @Validated request: ChangePasswordRequest,
+        @RequestBody
+        @Validated
+        request: ChangePasswordRequest,
         @Parameter(description = "Request body to change password", required = true, `in` = ParameterIn.PATH) @PathVariable token: String
     ): Map<String, String> =
         userService.changePassword(request = request, token = token)
@@ -260,13 +339,23 @@ class AuthController(
     @Operation(summary = "Logout Endpoint", tags = ["Authentication"])
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "201", description = "successful operation",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))),
-            ApiResponse(responseCode = "400", description = "Bad credentials",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))),
-            ApiResponse(responseCode = "500", description = "internal server error occurred",
-                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class))))
-    ])
+            ApiResponse(
+                responseCode = "201",
+                description = "successful operation",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = UserWrapperResponse::class)))
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad credentials",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "internal server error occurred",
+                content = arrayOf(Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = Schema(implementation = ExceptionDto::class)))
+            )
+        ]
+    )
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @Throws(ServerException::class)
     fun logout(request: HttpServletRequest) =

@@ -21,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional
 class CustomAuthenticationManager(
     private val userService: UserService,
     private val passwordEncoder: PasswordEncoder
-): AuthenticationManager {
+) : AuthenticationManager {
     private val log: Logger by logger()
 
     @Transactional
     override fun authenticate(authentication: Authentication): Authentication {
         val user: User = userService.findByEmail(email = authentication.name)
-        if (authentication.credentials != null){
+        if (authentication.credentials != null) {
             val matches: Boolean = passwordEncoder.matches(authentication.credentials.toString(), user.password)
             if (!matches) {
                 "Username or password invalid. AuthenticationCredentialsNotFoundException occurred for ${user.name}"
@@ -37,8 +37,9 @@ class CustomAuthenticationManager(
         }
         val authorities: MutableCollection<SimpleGrantedAuthority> = ArrayList()
         authorities.add(element = SimpleGrantedAuthority(RoleName.ROLE_USER.role))
-        if (user.roles.stream().anyMatch { r: Role -> r.name!! == RoleName.ROLE_ADMIN })
+        if (user.roles.stream().anyMatch { r: Role -> r.name!! == RoleName.ROLE_ADMIN }) {
             authorities.add(element = SimpleGrantedAuthority(RoleName.ROLE_ADMIN.role))
+        }
 
         val loadUserByUsername: org.springframework.security.core.userdetails.User = userService.loadUserByUsername(authentication.name)
         val auth: Authentication = UsernamePasswordAuthenticationToken(loadUserByUsername, user.password, authorities)

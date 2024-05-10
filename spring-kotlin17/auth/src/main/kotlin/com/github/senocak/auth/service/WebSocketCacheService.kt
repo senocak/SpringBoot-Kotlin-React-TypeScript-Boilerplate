@@ -7,15 +7,15 @@ import com.github.senocak.auth.util.logger
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
+import org.slf4j.MDC
+import org.springframework.scheduling.annotation.Async
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.web.socket.PingMessage
 import org.springframework.web.socket.TextMessage
 import java.io.IOException
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
-import org.slf4j.MDC
-import org.springframework.scheduling.annotation.Async
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.web.socket.PingMessage
 
 @Service
 class WebSocketCacheService(
@@ -133,7 +133,7 @@ class WebSocketCacheService(
      * @param to user to broadcast.
      */
     private fun broadCastAllUserList(to: String): Unit =
-        sendMessage(from = null, to = to, type = "online", payload = StringUtils.join(userSessionCache.keys,','))
+        sendMessage(from = null, to = to, type = "online", payload = StringUtils.join(userSessionCache.keys, ','))
 
     /**
      * this is scheduled to run every in 10_000 milliseconds period // every 10 seconds

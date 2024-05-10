@@ -18,4 +18,4 @@ fun createTestUser(): User =
             it.emailActivatedAt = Date()
         }
 
-fun RoleName.createRole(): Role = Role().also { it.name = this}
+fun RoleName.createRole(): Role = Role().also { it.name = this }

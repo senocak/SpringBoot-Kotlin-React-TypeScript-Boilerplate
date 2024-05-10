@@ -27,12 +27,12 @@ class WebSecurityConfig(
      * @param http -- It allows configuring web based security for specific http requests
      * @throws Exception -- throws Exception
      */
-    //@Profile("!integration-test")
+    // @Profile("!integration-test")
     @Throws(Exception::class)
     @Bean
     fun securityFilterChainDSL(http: HttpSecurity): SecurityFilterChain =
         http {
-            //cors {
+            // cors {
             //    configurationSource = UrlBasedCorsConfigurationSource()
             //        .also { ubccs: UrlBasedCorsConfigurationSource ->
             //            ubccs.registerCorsConfiguration("/**", CorsConfiguration()
@@ -44,11 +44,11 @@ class WebSecurityConfig(
             //                    cc.exposedHeaders = listOf("Content-Type", "X-Rate-Limit-Retry-After-Seconds", "X-Rate-Limit-Remaining")
             //                })
             //        }
-            //}
-            //cors { Customizer.withDefaults<CorsConfiguration>() }
+            // }
+            // cors { Customizer.withDefaults<CorsConfiguration>() }
             csrf { disable() }
             exceptionHandling { authenticationEntryPoint = unauthorizedHandler }
-            //httpBasic {}
+            // httpBasic {}
             authorizeRequests {
                 authorize(pattern = "/api/v1/auth/**", access = permitAll)
                 authorize(pattern = "/api/v1/public/**", access = permitAll)
@@ -59,17 +59,17 @@ class WebSecurityConfig(
                 authorize(pattern = "/*.html", access = permitAll)
                 authorize(pattern = "/graphql/v1", access = permitAll)
                 authorize(method = HttpMethod.GET, pattern = "/api/v1/ping", access = permitAll)
-                //authorize(matches = PathRequest.toH2Console(), access = permitAll)
-                //authorize(matches = CorsUtils::isPreFlightRequest, access = permitAll)
+                // authorize(matches = PathRequest.toH2Console(), access = permitAll)
+                // authorize(matches = CorsUtils::isPreFlightRequest, access = permitAll)
                 authorize(matches = anyRequest, access = authenticated)
             }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             headers { frameOptions { disable() } }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(filter = jwtAuthenticationFilter)
         }
-        .run { http.build() }
+            .run { http.build() }
 
-    //@Bean
+    // @Bean
     fun corsConfigurationSource(): CorsConfigurationSource =
         CorsConfiguration()
             .also {

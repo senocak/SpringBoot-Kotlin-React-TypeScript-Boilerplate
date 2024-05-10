@@ -2,7 +2,6 @@ package com.github.senocak.auth.config.initializer
 
 import com.github.senocak.auth.TestConstants
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
@@ -22,7 +21,7 @@ class RedisInitializer : ApplicationContextInitializer<ConfigurableApplicationCo
         TestPropertyValues.of(
             "REDIS_HOST=$host",
             "REDIS_PORT=$port",
-            "REDIS_PASSWORD=" + "",
+            "REDIS_PASSWORD=" + ""
         ).applyTo(configurableApplicationContext.environment)
 
         jedis = Jedis(host, port)

@@ -5,21 +5,21 @@ import com.github.senocak.auth.security.JwtTokenProvider
 import com.github.senocak.auth.service.WebSocketCacheService
 import com.github.senocak.auth.util.getQueryParams
 import com.github.senocak.auth.util.logger
-import java.net.URI
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import org.slf4j.Logger
 import org.springframework.http.server.ServerHttpRequest
 import org.springframework.http.server.ServerHttpResponse
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.WebSocketHandler
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor
+import java.net.URI
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 @Component
 class HttpHandshakeInterceptor(
     private val webSocketCacheService: WebSocketCacheService,
     private val jwtTokenProvider: JwtTokenProvider
-): HttpSessionHandshakeInterceptor() {
+) : HttpSessionHandshakeInterceptor() {
     private val log: Logger by logger()
     private val lock = ReentrantLock(true)
 
@@ -38,8 +38,12 @@ class HttpHandshakeInterceptor(
      * session; the provided attributes are copied, the original map is not used.
      * @return true if the WebSocket handshake should continue, false if the WebSocket
      */
-    override fun beforeHandshake(request: ServerHttpRequest, response: ServerHttpResponse, wsHandler: WebSocketHandler,
-                                 attributes: Map<String, Any>): Boolean {
+    override fun beforeHandshake(
+        request: ServerHttpRequest,
+        response: ServerHttpResponse,
+        wsHandler: WebSocketHandler,
+        attributes: Map<String, Any>
+    ): Boolean {
         lock.withLock {
             val requestUri: URI = request.uri
             log.info("[HttpHandshakeInterceptor:beforeHandshake] requestUri: $requestUri, requestPath: ${requestUri.path}, header: ${request.headers}")
@@ -47,8 +51,9 @@ class HttpHandshakeInterceptor(
             runCatching {
                 val (userId: String, _: String) = getAccessTokenFromQueryParams(query = requestUri.query)
                 val allWebSocketSession: Map<String, WebsocketIdentifier> = webSocketCacheService.allWebSocketSession
-                if (allWebSocketSession.containsKey(key = userId))
+                if (allWebSocketSession.containsKey(key = userId)) {
                     return false.also { log.warn("User already exists in the websocket session cache; rejecting websocket connection attempt!") }
+                }
             }.onFailure {
                 log.warn("Rejecting websocket connection attempt! ${it.message}")
                     .run { return false }
@@ -64,12 +69,16 @@ class HttpHandshakeInterceptor(
      * @param wsHandler the target WebSocket handler
      * @param ex an exception raised during the handshake, or `null` if none
      */
-    override fun afterHandshake(request: ServerHttpRequest, response: ServerHttpResponse, wsHandler: WebSocketHandler,
-                                ex: Exception?) {
+    override fun afterHandshake(
+        request: ServerHttpRequest,
+        response: ServerHttpResponse,
+        wsHandler: WebSocketHandler,
+        ex: Exception?
+    ) {
         log.info("[HttpHandshakeInterceptor:afterHandshake] request: $request, response: $response, wsHandler: $wsHandler, ex: $ex")
     }
 
-    private fun getAccessTokenFromQueryParams(query: String): Pair<String, String>  {
+    private fun getAccessTokenFromQueryParams(query: String): Pair<String, String> {
         val queryParams: Map<String, String> = query.getQueryParams() ?: throw Exception("QueryParams can not be empty")
         val accessToken: String = queryParams["access_token"] ?: throw Exception("Auth can not be empty")
         return Pair(first = jwtTokenProvider.getUserEmailFromJWT(token = accessToken), second = accessToken)

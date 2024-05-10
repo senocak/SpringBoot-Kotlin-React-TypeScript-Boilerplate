@@ -1,21 +1,21 @@
 package com.github.senocak.auth.domain
 
 import com.github.senocak.auth.util.RoleName
-import java.util.UUID
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
+import java.util.UUID
 
 @Repository
-interface RoleRepository: PagingAndSortingRepository<Role, UUID> {
+interface RoleRepository : PagingAndSortingRepository<Role, UUID> {
     fun findByName(roleName: RoleName): Role?
 }
 
 @Repository
-interface UserRepository: PagingAndSortingRepository<User, UUID>, CrudRepository<User, UUID>, JpaSpecificationExecutor<User> {
+interface UserRepository : PagingAndSortingRepository<User, UUID>, CrudRepository<User, UUID>, JpaSpecificationExecutor<User> {
     fun findByEmail(email: String?): User?
     fun existsByEmail(email: String?): Boolean
 }
@@ -43,6 +43,3 @@ interface PasswordResetTokenRepository : CrudRepository<PasswordResetToken, UUID
     fun findByToken(token: String): PasswordResetToken?
     fun findByUserId(userId: UUID): PasswordResetToken?
 }
-
-
-

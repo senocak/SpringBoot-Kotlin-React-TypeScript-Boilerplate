@@ -3,7 +3,6 @@ package com.github.senocak.auth.util.validation
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
-import kotlin.reflect.KClass
 import org.passay.CharacterRule
 import org.passay.EnglishCharacterData
 import org.passay.LengthRule
@@ -11,6 +10,7 @@ import org.passay.PasswordData
 import org.passay.PasswordValidator
 import org.passay.RuleResult
 import org.passay.WhitespaceRule
+import kotlin.reflect.KClass
 
 @MustBeDocumented
 @Constraint(validatedBy = [PasswordConstraintsValidator::class])
@@ -30,13 +30,14 @@ class PasswordConstraintsValidator : ConstraintValidator<Password?, String?> {
 
     override fun initialize(constraintAnnotation: Password?) {
         super.initialize(constraintAnnotation)
-        if (constraintAnnotation?.detailedMessage != null)
+        if (constraintAnnotation?.detailedMessage != null) {
             detailedMessage = constraintAnnotation.detailedMessage
+        }
     }
 
     override fun isValid(password: String?, context: ConstraintValidatorContext): Boolean =
         when (password) {
-            null ->  true
+            null -> true
             else -> {
                 val validator = PasswordValidator(
                     arrayListOf(
@@ -53,12 +54,12 @@ class PasswordConstraintsValidator : ConstraintValidator<Password?, String?> {
                 when {
                     result.isValid -> true
                     else -> {
-                            if (detailedMessage) {
-                                val messages: List<String> = validator.getMessages(result)
-                                context.buildConstraintViolationWithTemplate(messages.joinToString(separator = "\n"))
-                                    .addConstraintViolation()
-                                    .disableDefaultConstraintViolation()
-                            }
+                        if (detailedMessage) {
+                            val messages: List<String> = validator.getMessages(result)
+                            context.buildConstraintViolationWithTemplate(messages.joinToString(separator = "\n"))
+                                .addConstraintViolation()
+                                .disableDefaultConstraintViolation()
+                        }
                         false
                     }
                 }

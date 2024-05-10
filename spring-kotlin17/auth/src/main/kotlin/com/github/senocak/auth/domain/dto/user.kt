@@ -24,7 +24,7 @@ class UserResponse(
 
     @Schema(example = "1253123123", description = "Email activation datetime", required = false, name = "emailActivatedAt", type = "Long")
     var emailActivatedAt: Long? = null
-): BaseDto()
+) : BaseDto()
 
 @PasswordMatches
 data class UpdateUserDto(
@@ -40,11 +40,11 @@ data class UpdateUserDto(
     @Schema(example = "Anil123", description = "Password confirmation", required = true, name = "password", type = "String")
     @field:Password(message = "{invalid_password}", detailedMessage = true)
     var passwordConfirmation: String? = null
-): BaseDto()
+) : BaseDto()
 
 class UserPaginationDTO(
     pageModel: Page<User>,
     items: List<UserResponse>,
     sortBy: String? = null,
     sort: String? = null
-): PaginationResponse<User, UserResponse>(page = pageModel, items = items, sortBy = sortBy, sort = sort)
+) : PaginationResponse<User, UserResponse>(page = pageModel, items = items, sortBy = sortBy, sort = sort)

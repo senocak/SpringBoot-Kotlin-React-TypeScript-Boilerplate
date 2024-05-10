@@ -7,19 +7,19 @@ import com.github.senocak.auth.domain.dto.ServiceData
 import com.github.senocak.auth.domain.dto.UserResponse
 import com.github.senocak.auth.util.Action
 import com.github.senocak.auth.util.logger
-import java.util.Locale
 import org.slf4j.Logger
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.stereotype.Component
 import org.thymeleaf.ITemplateEngine
 import org.thymeleaf.context.Context
+import java.util.Locale
 
 @Component
 class RabbitMqListener(
     private val objectMapper: ObjectMapper,
     private val emailService: EmailService,
     private val htmlTemplateEngine: ITemplateEngine
-){
+) {
     private val log: Logger by logger()
 
     @RabbitListener(queues = ["\${app.rabbitmq.QUEUE}"])

@@ -20,8 +20,8 @@ import org.springframework.web.context.support.RequestHandledEvent
 class Listeners(
     private val emailService: EmailService,
     private val emailActivationTokenService: EmailActivationTokenService,
-    private val webSocketCacheService: WebSocketCacheService,
-){
+    private val webSocketCacheService: WebSocketCacheService
+) {
     private val log: Logger by logger()
 
     @Transactional

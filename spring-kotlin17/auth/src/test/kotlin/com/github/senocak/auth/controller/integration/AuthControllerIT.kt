@@ -24,7 +24,6 @@ import com.github.senocak.auth.service.UserService
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.RoleName
 import com.github.senocak.auth.util.randomStringGenerator
-import java.util.UUID
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.hasSize
 import org.hamcrest.core.IsEqual.equalTo
@@ -45,6 +44,7 @@ import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import java.util.UUID
 
 /**
  * This integration test class is written for
@@ -54,10 +54,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 @DisplayName("Integration Tests for AuthController")
 class AuthControllerIT {
     @Autowired private lateinit var authController: AuthController
+
     @Autowired private lateinit var objectMapper: ObjectMapper
+
     @Autowired private lateinit var userService: UserService
+
     @Autowired private lateinit var emailActivationTokenService: EmailActivationTokenService
+
     @Autowired private lateinit var messageSourceService: MessageSourceService
+
     @Autowired private lateinit var passwordResetTokenRepository: PasswordResetTokenRepository
 
     private lateinit var mockMvc: MockMvc
@@ -92,17 +97,41 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(4)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("password: {not_blank}", "password: {min_max_length}",
-                        "email: {min_max_length}", "email: {not_blank}")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.BAD_REQUEST.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(4)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder(
+                            "password: {not_blank}",
+                            "password: {min_max_length}",
+                            "email: {min_max_length}",
+                            "email: {not_blank}"
+                        )
+                    )
+                )
         }
 
         @Test
@@ -122,16 +151,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.UNAUTHORIZED.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.UNAUTHORIZED.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.UNAUTHORIZED.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables[0]",
-                    equalTo("Username or password invalid. AuthenticationCredentialsNotFoundException occurred for Lucienne")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.UNAUTHORIZED.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.UNAUTHORIZED.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.UNAUTHORIZED.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables[0]",
+                        equalTo("Username or password invalid. AuthenticationCredentialsNotFoundException occurred for Lucienne")
+                    )
+                )
         }
 
         @Test
@@ -151,16 +200,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.UNAUTHORIZED.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.UNAUTHORIZED.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.UNAUTHORIZED.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables[0]",
-                    equalTo("Email not activated!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.UNAUTHORIZED.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.UNAUTHORIZED.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.UNAUTHORIZED.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables[0]",
+                        equalTo("Email not activated!")
+                    )
+                )
         }
 
         @Test
@@ -205,27 +274,47 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(6)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder(
-                        "password: {min_max_length}",
-                        "password: Password must be 6 or more characters in length.\n" +
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.BAD_REQUEST.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(6)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder(
+                            "password: {min_max_length}",
+                            "password: Password must be 6 or more characters in length.\n" +
                                 "Password must contain 1 or more uppercase characters.\n" +
                                 "Password must contain 1 or more lowercase characters.\n" +
                                 "Password must contain 1 or more digit characters.\n" +
                                 "Password must contain 1 or more special characters.",
-                        "email: Invalid email",
-                        "password: {not_blank}",
-                        "name: {not_blank}",
-                        "name: {min_max_length}"
-                    )))
+                            "email: Invalid email",
+                            "password: {not_blank}",
+                            "name: {not_blank}",
+                            "name: {min_max_length}"
+                        )
+                    )
+                )
         }
 
         @Test
@@ -246,16 +335,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables[0]",
-                    equalTo("Email is already using: $USER_EMAIL")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.BAD_REQUEST.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables[0]",
+                        equalTo("Email is already using: $USER_EMAIL")
+                    )
+                )
         }
 
         @Test
@@ -272,8 +381,12 @@ class AuthControllerIT {
             perform
                 .andExpect(MockMvcResultMatchers.status().isCreated)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", IsNull.notNullValue()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    equalTo("Please verify your email to login")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.message",
+                        equalTo("Please verify your email to login")
+                    )
+                )
         }
     }
 
@@ -301,16 +414,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("token: {min_max_length}")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.BAD_REQUEST.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.JSON_SCHEMA_VALIDATOR.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("token: {min_max_length}")
+                    )
+                )
         }
 
         @Test
@@ -330,16 +463,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.NOT_FOUND.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("Token is not found in redis")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.NOT_FOUND.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("Token is not found in redis")
+                    )
+                )
         }
 
         @Test
@@ -398,8 +551,12 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    equalTo("Your e-mail activated successfully!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.message",
+                        equalTo("Your e-mail activated successfully!")
+                    )
+                )
         }
     }
 
@@ -422,16 +579,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.NOT_FOUND.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("User not found!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.NOT_FOUND.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("User not found!")
+                    )
+                )
         }
 
         @Test
@@ -447,16 +624,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("This e-mail is already activated!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.BAD_REQUEST.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("This e-mail is already activated!")
+                    )
+                )
         }
 
         @Test
@@ -478,8 +675,12 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    equalTo("Activation e-mail sent!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.message",
+                        equalTo("Activation e-mail sent!")
+                    )
+                )
         }
     }
 
@@ -502,16 +703,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.NOT_FOUND.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("User not found!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.NOT_FOUND.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("User not found!")
+                    )
+                )
         }
 
         @Test
@@ -534,16 +755,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isConflict)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.CONFLICT.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("PasswordReset Token is already sent to mail.")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.CONFLICT.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("PasswordReset Token is already sent to mail.")
+                    )
+                )
         }
 
         @Test
@@ -559,8 +800,12 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    equalTo("Password reset link sent")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.message",
+                        equalTo("Password reset link sent")
+                    )
+                )
         }
     }
 
@@ -586,28 +831,48 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.UNPROCESSABLE_ENTITY.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.GENERIC_SERVICE_ERROR.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.GENERIC_SERVICE_ERROR.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(5)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder(
-                        "Validation error!",
-                        "password: {min_max_length}",
-                        "password: Password must be 6 or more characters in length.\n" +
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.GENERIC_SERVICE_ERROR.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.GENERIC_SERVICE_ERROR.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(5)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder(
+                            "Validation error!",
+                            "password: {min_max_length}",
+                            "password: Password must be 6 or more characters in length.\n" +
                                 "Password must contain 1 or more uppercase characters.\n" +
                                 "Password must contain 1 or more digit characters.\n" +
                                 "Password must contain 1 or more special characters.",
-                        "passwordConfirmation: Password must be 6 or more characters in length.\n" +
+                            "passwordConfirmation: Password must be 6 or more characters in length.\n" +
                                 "Password must contain 1 or more uppercase characters.\n" +
                                 "Password must contain 1 or more digit characters.\n" +
                                 "Password must contain 1 or more special characters.",
-                        "email: {invalid_email}"
-                    )))
+                            "email: {invalid_email}"
+                        )
+                    )
+                )
         }
 
         @Test
@@ -625,16 +890,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.NOT_FOUND.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("PasswordReset Token is expired for token")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.NOT_FOUND.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("PasswordReset Token is expired for token")
+                    )
+                )
         }
 
         @Test
@@ -657,16 +942,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.NOT_FOUND.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.NOT_FOUND.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("User not found!")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.NOT_FOUND.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.NOT_FOUND.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("User not found!")
+                    )
+                )
         }
 
         @Test
@@ -689,16 +994,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("PasswordReset Token is invalid")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.BAD_REQUEST.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("PasswordReset Token is invalid")
+                    )
+                )
         }
 
         @Test
@@ -721,16 +1046,36 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isConflict)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.statusCode",
-                    equalTo(HttpStatus.CONFLICT.value())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.id",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.error.text",
-                    equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    hasSize<Any>(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.exception.variables",
-                    containsInAnyOrder("New password should be different from older one")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.statusCode",
+                        equalTo(HttpStatus.CONFLICT.value())
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.id",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.messageId)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.error.text",
+                        equalTo(OmaErrorMessageType.BASIC_INVALID_INPUT.text)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        hasSize<Any>(1)
+                    )
+                )
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.exception.variables",
+                        containsInAnyOrder("New password should be different from older one")
+                    )
+                )
         }
 
         @Test
@@ -753,8 +1098,12 @@ class AuthControllerIT {
             // Then
             perform
                 .andExpect(MockMvcResultMatchers.status().isOk)
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message",
-                    equalTo("Password changed successfully")))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath(
+                        "$.message",
+                        equalTo("Password changed successfully")
+                    )
+                )
         }
     }
 

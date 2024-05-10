@@ -21,7 +21,7 @@ class PostgresqlInitializer : ApplicationContextInitializer<ConfigurableApplicat
 
     companion object {
         @Container private var CONTAINER: PostgreSQLContainer<*> = PostgreSQLContainer("postgres:14")
-            //.withExposedPorts(3306)
+            // .withExposedPorts(3306)
             .withDatabaseName("spring")
             .withUsername("postgres")
             .withPassword("secret")

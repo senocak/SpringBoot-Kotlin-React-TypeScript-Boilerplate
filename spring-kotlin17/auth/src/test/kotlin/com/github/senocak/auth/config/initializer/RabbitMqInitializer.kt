@@ -1,15 +1,15 @@
 package com.github.senocak.auth.config.initializer
 
 import com.github.senocak.auth.TestConstants
+import com.rabbitmq.client.Channel
 import com.rabbitmq.client.ConnectionFactory
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
-import org.springframework.boot.test.util.TestPropertyValues
-import com.rabbitmq.client.Channel
 
 @TestConfiguration
 class RabbitMqInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -17,11 +17,11 @@ class RabbitMqInitializer : ApplicationContextInitializer<ConfigurableApplicatio
         val host: String = CONTAINER.host
         val port: Int = CONTAINER.getMappedPort(RABBIT_MQ_PORT)
         TestPropertyValues.of(
-                "spring.rabbitmq.host=$host",
-                "spring.rabbitmq.port=$port",
-                "spring.rabbitmq.user=guest",
-                "spring.rabbitmq.password=guest"
-            )
+            "spring.rabbitmq.host=$host",
+            "spring.rabbitmq.port=$port",
+            "spring.rabbitmq.user=guest",
+            "spring.rabbitmq.password=guest"
+        )
             .applyTo(configurableApplicationContext.environment)
 
         val factory = ConnectionFactory()
@@ -36,8 +36,9 @@ class RabbitMqInitializer : ApplicationContextInitializer<ConfigurableApplicatio
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
-        if (rabbitmq == null)
+        if (rabbitmq == null) {
             throw RuntimeException("RabbitMQ is not initialized!")
+        }
     }
 
     companion object {

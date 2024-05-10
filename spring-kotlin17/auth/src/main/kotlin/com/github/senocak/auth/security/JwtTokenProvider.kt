@@ -17,13 +17,13 @@ import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SignatureException
-import java.security.Key
-import java.util.Date
 import org.slf4j.Logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
+import java.security.Key
+import java.util.Date
 
 @Component
 class JwtTokenProvider(
@@ -32,9 +32,14 @@ class JwtTokenProvider(
 ) {
     private val log: Logger by logger()
 
-    @Value("\${app.jwtSecret}") private lateinit var jwtSecret: String
-    @Value("\${app.jwtExpirationInMs}") private lateinit var jwtExpirationInMs: String
-    @Value("\${app.refreshExpirationInMs}") private lateinit var refreshExpirationInMs: String
+    @Value("\${app.jwtSecret}")
+    private lateinit var jwtSecret: String
+
+    @Value("\${app.jwtExpirationInMs}")
+    private lateinit var jwtExpirationInMs: String
+
+    @Value("\${app.refreshExpirationInMs}")
+    private lateinit var refreshExpirationInMs: String
 
     /**
      * Generating the jwt token
@@ -144,8 +149,11 @@ class JwtTokenProvider(
 
     fun findByTokenAndThrowException(token: String): JwtToken =
         findByToken(token = token)
-            ?: throw ServerException(omaErrorMessageType = OmaErrorMessageType.NOT_FOUND, statusCode = HttpStatus.NOT_FOUND,
-                variables = arrayOf(messageSourceService.get(code = "token_not_found_in_redis")))
+            ?: throw ServerException(
+                omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
+                statusCode = HttpStatus.NOT_FOUND,
+                variables = arrayOf(messageSourceService.get(code = "token_not_found_in_redis"))
+            )
 
     fun findByToken(token: String): JwtToken? = jwtTokenRepository.findByToken(token = token)
 
