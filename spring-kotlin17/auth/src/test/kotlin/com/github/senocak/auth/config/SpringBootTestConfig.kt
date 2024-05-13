@@ -9,6 +9,7 @@ import org.junit.jupiter.api.TestClassOrder
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
+//import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -33,4 +34,5 @@ import org.springframework.transaction.annotation.Transactional
 )
 // @TestPropertySource({"/application-integration-test.yml" })
 // @TestPropertySource(properties = ["spring.autoconfigure.exclude=graphql.kickstart.spring.web.boot.GraphQLWebsocketAutoConfiguration"])
+//@EmbeddedKafka(partitions = 1, brokerProperties = ["listeners=PLAINTEXT://localhost:9092", "port=9092"])
 annotation class SpringBootTestConfig
