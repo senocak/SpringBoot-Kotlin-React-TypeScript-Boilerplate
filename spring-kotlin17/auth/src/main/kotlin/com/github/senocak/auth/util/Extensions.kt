@@ -5,8 +5,10 @@ import com.github.senocak.auth.domain.Role
 import com.github.senocak.auth.domain.User
 import com.github.senocak.auth.domain.dto.RoleResponse
 import com.github.senocak.auth.domain.dto.UserResponse
+import com.github.senocak.auth.domain.dto.UserRevisionDTO
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.history.Revision
 import org.springframework.util.StringUtils
 import java.text.Normalizer
 import java.util.Date
@@ -21,6 +23,13 @@ fun User.convertEntityToDto(): UserResponse =
         email = this.email!!,
         roles = this.roles.stream().map { r: Role -> r.convertEntityToDto() }.toList(),
         emailActivatedAt = this.emailActivatedAt?.time
+    )
+
+fun Revision<Long, User>.convertEntityToRevisionDto(): UserRevisionDTO =
+    UserRevisionDTO(
+        revisionType = this.metadata.revisionType,
+        revisionInstant = this.revisionInstant.get().toEpochMilli(),
+        data = this.entity.convertEntityToDto()
     )
 
 /**

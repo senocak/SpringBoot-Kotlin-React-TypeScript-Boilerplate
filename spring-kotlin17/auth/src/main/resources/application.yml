@@ -23,6 +23,12 @@ spring:
   jpa:
     properties:
       hibernate:
+        envers:
+          audit_table_prefix: AU_
+          revision_field_name: REV_ID
+          revision_type_field_name: REV_TYPE
+          store_data_at_delete: true
+          default_schema: ${POSTGRESQL_SCHEMA:public}
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_sql_comments: true
@@ -64,7 +70,7 @@ logging:
         web: debug
         security: debug
       hibernate:
-        SQL: off
+        SQL: debug
   #file:
   #  name: ./var/logs/app.log
 app:
@@ -74,11 +80,11 @@ app:
   default-locale: en
   frontend-url: ${APP_FRONTEND_URL:http://localhost:3232}
   mail:
-    host: ${MAIL_HOST:smtp.yandex.com.tr}
-    port: 587
+    host: ${MAIL_HOST:smtp.ethereal.email}
+    port: ${MAIL_PORT:587}
     protocol: ${MAIL_PROTOCOL:smtp}
-    username: ${MAIL_USERNAME:notification@cosmosboard.com}
-    password: ${MAIL_PASSWORD:xsqgbadvvwxasyoq}
+    username: ${MAIL_USERNAME:bart15@ethereal.email}
+    password: ${MAIL_PASSWORD:SVPgMHw6JNyv3na35S}
     smtp:
       socketFactory:
         port: 465
@@ -100,6 +106,15 @@ app:
     EXCHANGE: ${EXCHANGE:spring-jwt-exchange}
     QUEUE: ${QUEUE:spring-jwt-queue}
     ROUTING_KEY: ${ROUTING_KEY:spring-jwt-routing-key}
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      topic:
+        bucket-create: bucket-create-request
+    consumer:
+      topic:
+        bucket-create: bucket-create-response
+        postgresql-changes-user: postgresql-changes-local.public.users
 springdoc:
   api-docs:
     path: /api/v1/swagger

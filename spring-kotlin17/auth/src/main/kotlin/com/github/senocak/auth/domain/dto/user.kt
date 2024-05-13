@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
 import org.springframework.data.domain.Page
+import org.springframework.data.history.Revision
+import org.springframework.data.history.RevisionMetadata
 
 @JsonPropertyOrder("name", "username", "email", "roles", "resourceUrl")
 class UserResponse(
@@ -23,7 +25,9 @@ class UserResponse(
     var roles: List<RoleResponse>,
 
     @Schema(example = "1253123123", description = "Email activation datetime", required = false, name = "emailActivatedAt", type = "Long")
-    var emailActivatedAt: Long? = null
+    var emailActivatedAt: Long? = null,
+
+    var history: UserRevisionPaginationDTO? = null
 ) : BaseDto()
 
 @PasswordMatches
@@ -48,3 +52,14 @@ class UserPaginationDTO(
     sortBy: String? = null,
     sort: String? = null
 ) : PaginationResponse<User, UserResponse>(page = pageModel, items = items, sortBy = sortBy, sort = sort)
+
+data class UserRevisionDTO(
+    val revisionType: RevisionMetadata.RevisionType,
+    val revisionInstant: Long,
+    val data: UserResponse
+) : BaseDto()
+
+class UserRevisionPaginationDTO(
+    pageModel: Page<Revision<Long, User>>,
+    items: List<UserRevisionDTO>
+) : PaginationResponse<Revision<Long, User>, UserRevisionDTO>(page = pageModel, items = items)

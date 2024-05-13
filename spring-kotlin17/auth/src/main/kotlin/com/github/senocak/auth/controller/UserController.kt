@@ -7,6 +7,7 @@ import com.github.senocak.auth.domain.dto.PaginationCriteria
 import com.github.senocak.auth.domain.dto.UpdateUserDto
 import com.github.senocak.auth.domain.dto.UserPaginationDTO
 import com.github.senocak.auth.domain.dto.UserResponse
+import com.github.senocak.auth.domain.dto.UserRevisionPaginationDTO
 import com.github.senocak.auth.domain.dto.UserWrapperResponse
 import com.github.senocak.auth.exception.ServerException
 import com.github.senocak.auth.security.Authorize
@@ -19,6 +20,7 @@ import com.github.senocak.auth.util.AppConstants.SECURITY_SCHEME_NAME
 import com.github.senocak.auth.util.AppConstants.USER
 import com.github.senocak.auth.util.OmaErrorMessageType
 import com.github.senocak.auth.util.convertEntityToDto
+import com.github.senocak.auth.util.convertEntityToRevisionDto
 import com.github.senocak.auth.util.logger
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -30,6 +32,9 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.constraints.Pattern
 import org.slf4j.Logger
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.history.Revision
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -73,7 +78,34 @@ class UserController(
         security = [SecurityRequirement(name = SECURITY_SCHEME_NAME, scopes = [ADMIN, USER])]
     )
     @GetMapping("/me")
-    fun me(): UserResponse = userService.loggedInUser().convertEntityToDto()
+    fun me(
+        @Parameter(description = "Show history", required = false)
+        @RequestParam(required = false, defaultValue = "false")
+        history: Boolean,
+        @Parameter(name = "page", description = "Page number", example = DEFAULT_PAGE_NUMBER)
+        @RequestParam(defaultValue = "1", required = false)
+        page: Int,
+        @Parameter(name = "size", description = "Page size", example = DEFAULT_PAGE_SIZE)
+        @RequestParam(defaultValue = "\${spring.data.web.pageable.default-page-size:10}", required = false)
+        size: Int
+    ): UserResponse = run {
+        val me = userService.loggedInUser()
+        var userRevisionPaginationDTO: UserRevisionPaginationDTO? = null
+        if (history) {
+            val pr: PageRequest = PageRequestBuilder.build(paginationCriteria = PaginationCriteria(page = page, size = size))
+            val revisionPage: Page<Revision<Long, User>> = userService.findRevisions(id = me.id!!, pr = pr)
+            userRevisionPaginationDTO = UserRevisionPaginationDTO(
+                pageModel = revisionPage,
+                items = revisionPage.content.map { it: Revision<Long, User> -> it.convertEntityToRevisionDto() }.toList()
+            )
+        }
+        me.convertEntityToDto()
+            .apply {
+                if (userRevisionPaginationDTO != null) {
+                    this.history = userRevisionPaginationDTO
+                }
+            }
+    }
 
     @PatchMapping("/me")
     @Operation(

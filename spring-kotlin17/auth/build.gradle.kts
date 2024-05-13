@@ -32,6 +32,8 @@ val cucumber = "4.2.0"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.data:spring-data-envers")
+    implementation("org.hibernate:hibernate-envers:6.4.0.Final")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("redis.clients:jedis:3.3.0")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -44,6 +46,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.kafka:spring-kafka")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
     implementation("com.google.guava:guava:33.0.0-jre")
@@ -61,13 +64,11 @@ dependencies {
 
     runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
     runtimeOnly("org.postgresql:postgresql")
-    implementation("io.debezium:debezium-api:$debezium")
-    implementation("io.debezium:debezium-embedded:$debezium")
-    implementation("io.debezium:debezium-connector-postgres:$debezium")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.amqp:spring-rabbit-test")
+    // testImplementation("org.springframework.amqp:spring-rabbit-test")
+    // testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:postgresql")

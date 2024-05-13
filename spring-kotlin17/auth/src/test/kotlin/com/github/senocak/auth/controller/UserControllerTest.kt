@@ -56,7 +56,7 @@ class UserControllerTest {
             // Given
             doThrow(toBeThrown = ServerException::class).`when`(userService).loggedInUser()
             // When
-            val closureToTest = Executable { userController.me() }
+            val closureToTest = Executable { userController.me(history = false, page = 0, size = 100) }
             // Then
             assertThrows(ServerException::class.java, closureToTest)
         }
@@ -67,7 +67,7 @@ class UserControllerTest {
             // Given
             doReturn(value = user).`when`(userService).loggedInUser()
             // When
-            val getMe: UserResponse = userController.me()
+            val getMe: UserResponse = userController.me(history = false, page = 0, size = 100)
             // Then
             assertNotNull(getMe)
             assertEquals(user.email, getMe.email)

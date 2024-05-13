@@ -17,7 +17,9 @@ import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
 import org.slf4j.Logger
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.history.Revision
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
@@ -206,4 +208,6 @@ class UserService(
     }
 
     fun countOfUsers(): Int = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Int::class.java)!!
+
+    fun findRevisions(id: UUID, pr: PageRequest): Page<Revision<Long, User>> = userRepository.findRevisions(id, pr)
 }

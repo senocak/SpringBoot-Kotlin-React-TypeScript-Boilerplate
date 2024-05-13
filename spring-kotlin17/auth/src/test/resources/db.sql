@@ -45,3 +45,39 @@ INSERT INTO users (id, created_at, updated_at, email, name, password, email_acti
     VALUES ('4cb9374e-4e52-4142-a1af-16144ef4a27d', '2023-07-16 10:34:44.000000', '2023-07-16 10:34:44.000000', 'anilnotactivated@senocak.com', 'Lorem', '$2a$10$/ES5OgtWqva1aiGu/oE9HOpSmOvMFYOGamv/WM9wQUcQClqCMyWzy', null);
 INSERT INTO user_roles (user_id, role_id) VALUES ('4cb9374e-4e52-4142-a1af-16144ef4a27d', '11b9374e-4e52-4142-a1af-16144ef4a27d');
 
+
+create table audit_revision_entity(
+    id         integer not null primary key,
+    timestamp  bigint  not null,
+    updated_at timestamp(6)
+);
+
+create table user_audit(
+    rev                integer not null constraint fk_user_audit_rev references audit_revision_entity,
+    revtype            smallint,
+    email_activated_at timestamp(6),
+    id                 uuid    not null,
+    email              varchar(255),
+    name               varchar(255),
+    password           varchar(255),
+    primary key (rev, id)
+);
+
+create table user_roles_aud (
+    rev     integer not null constraint fk_user_roles_audit_rev references audit_revision_entity,
+    revtype smallint,
+    role_id uuid    not null,
+    user_id uuid    not null,
+    primary key (rev, role_id, user_id)
+);
+
+create table email_activation_tokens_aud(
+    rev             integer not null constraint fk_email_activation_tokens_audit_rev references audit_revision_entity,
+    revtype         smallint,
+    expiration_date timestamp(6),
+    id              uuid    not null,
+    user_id         uuid,
+    token           varchar(64),
+    primary key (rev, id)
+);
+create sequence audit_revision_entity_seq increment by 50;

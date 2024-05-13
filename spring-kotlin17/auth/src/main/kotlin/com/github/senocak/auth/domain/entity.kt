@@ -23,14 +23,23 @@ import org.hibernate.Hibernate
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
+import org.hibernate.envers.AuditJoinTable
+import org.hibernate.envers.AuditTable
+import org.hibernate.envers.Audited
+import org.hibernate.envers.DefaultRevisionEntity
+import org.hibernate.envers.RelationTargetAuditMode
+import org.hibernate.envers.RevisionEntity
+import org.hibernate.envers.RevisionListener
 import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.TimeToLive
 import org.springframework.data.redis.core.index.Indexed
 import java.io.Serializable
+import java.time.LocalDateTime
 import java.util.Date
 import java.util.Objects
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import org.springframework.data.annotation.Id as SDID
 
 @MappedSuperclass
 open class BaseDomain(
@@ -55,17 +64,21 @@ open class BaseDomain(
         UniqueConstraint(columnNames = ["email"])
     ]
 )
+@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+@AuditTable(value = "user_audit")
 data class User(
     @Column var name: String? = null,
     @Column var email: String? = null,
     @Column var password: String? = null
 ) : BaseDomain() {
+    // @NotAudited
     @JoinTable(
         name = "user_roles",
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")]
     )
     @ManyToMany(fetch = FetchType.EAGER)
+    @AuditJoinTable
     var roles: List<Role> = arrayListOf()
 
     @OneToOne(mappedBy = "user")
@@ -88,6 +101,7 @@ data class Role(
     name = "email_activation_tokens",
     uniqueConstraints = [UniqueConstraint(columnNames = ["token"], name = "uk_email_activation_tokens_token")]
 )
+@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 data class EmailActivationToken(
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -121,7 +135,7 @@ data class EmailActivationToken(
 
 @RedisHash(value = "jwtTokens")
 data class JwtToken(
-    @org.springframework.data.annotation.Id
+    @SDID
     @Indexed
     val token: String,
 
@@ -136,7 +150,7 @@ data class JwtToken(
 
 @RedisHash("password_reset_tokens")
 data class PasswordResetToken(
-    @org.springframework.data.annotation.Id
+    @SDID
     @Indexed
     val token: String,
 
@@ -146,3 +160,16 @@ data class PasswordResetToken(
     @TimeToLive(unit = TimeUnit.MILLISECONDS)
     val timeToLive: Long = TimeUnit.MINUTES.toMillis(30)
 )
+
+@Entity
+@RevisionEntity(AuditRevisionListener::class)
+class AuditRevisionEntity : DefaultRevisionEntity() {
+    var updatedAt: LocalDateTime? = null
+}
+
+class AuditRevisionListener : RevisionListener {
+    override fun newRevision(revisionEntity: Any) {
+        val auditRevisionEntity: AuditRevisionEntity = revisionEntity as AuditRevisionEntity
+        auditRevisionEntity.updatedAt = LocalDateTime.now()
+    }
+}

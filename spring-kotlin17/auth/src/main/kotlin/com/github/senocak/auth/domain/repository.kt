@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
+import org.springframework.data.repository.history.RevisionRepository
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -15,7 +16,11 @@ interface RoleRepository : PagingAndSortingRepository<Role, UUID> {
 }
 
 @Repository
-interface UserRepository : PagingAndSortingRepository<User, UUID>, CrudRepository<User, UUID>, JpaSpecificationExecutor<User> {
+interface UserRepository :
+    PagingAndSortingRepository<User, UUID>,
+    CrudRepository<User, UUID>,
+    JpaSpecificationExecutor<User>,
+    RevisionRepository<User, UUID, Long> {
     fun findByEmail(email: String?): User?
     fun existsByEmail(email: String?): Boolean
 }
