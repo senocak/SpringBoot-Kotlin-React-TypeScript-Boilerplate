@@ -101,9 +101,8 @@ class UserController(
         }
         me.convertEntityToDto()
             .apply {
-                if (userRevisionPaginationDTO != null) {
+                if (userRevisionPaginationDTO != null)
                     this.history = userRevisionPaginationDTO
-                }
             }
     }
 

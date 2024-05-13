@@ -28,7 +28,7 @@ import org.springframework.web.servlet.NoHandlerFoundException
 import java.lang.reflect.UndeclaredThrowableException
 import java.security.InvalidParameterException
 import java.util.function.Consumer
-// import org.springframework.web.servlet.resource.NoResourceFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class RestExceptionHandler(
@@ -47,7 +47,7 @@ class RestExceptionHandler(
         MismatchedInputException::class,
         UndeclaredThrowableException::class
     )
-    fun handleBadRequestException(ex: Exception): ResponseEntity<Any> =
+    fun handleBadRequestException(ex: Exception): ResponseEntity<ExceptionDto> =
         generateResponseEntity(
             httpStatus = HttpStatus.BAD_REQUEST,
             variables = arrayOf(messageSourceService.get(code = "malformed_json_request"), ex.message),
@@ -59,7 +59,7 @@ class RestExceptionHandler(
         AuthenticationCredentialsNotFoundException::class,
         com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException::class
     )
-    fun handleUnAuthorized(ex: Exception): ResponseEntity<Any> =
+    fun handleUnAuthorized(ex: Exception): ResponseEntity<ExceptionDto> =
         generateResponseEntity(
             httpStatus = HttpStatus.UNAUTHORIZED,
             variables = arrayOf(ex.message),
@@ -67,7 +67,7 @@ class RestExceptionHandler(
         )
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-    fun handleHttpRequestMethodNotSupported(ex: HttpRequestMethodNotSupportedException): ResponseEntity<Any> =
+    fun handleHttpRequestMethodNotSupported(ex: HttpRequestMethodNotSupportedException): ResponseEntity<ExceptionDto> =
         generateResponseEntity(
             httpStatus = HttpStatus.METHOD_NOT_ALLOWED,
             variables = arrayOf(messageSourceService.get(code = "method_not_supported"), ex.message),
@@ -75,7 +75,7 @@ class RestExceptionHandler(
         )
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
-    fun handleHttpMediaTypeNotSupported(ex: HttpMediaTypeNotSupportedException): ResponseEntity<Any> =
+    fun handleHttpMediaTypeNotSupported(ex: HttpMediaTypeNotSupportedException): ResponseEntity<ExceptionDto> =
         generateResponseEntity(
             httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE,
             omaErrorMessageType = OmaErrorMessageType.BASIC_INVALID_INPUT,
@@ -84,10 +84,10 @@ class RestExceptionHandler(
 
     @ExceptionHandler(
         NoHandlerFoundException::class,
-        UsernameNotFoundException::class
-        // NoResourceFoundException::class
+        UsernameNotFoundException::class,
+        NoResourceFoundException::class
     )
-    fun handleNoHandlerFoundException(ex: Exception): ResponseEntity<Any> =
+    fun handleNoHandlerFoundException(ex: Exception): ResponseEntity<ExceptionDto> =
         generateResponseEntity(
             httpStatus = HttpStatus.NOT_FOUND,
             omaErrorMessageType = OmaErrorMessageType.NOT_FOUND,
@@ -95,7 +95,7 @@ class RestExceptionHandler(
         )
 
     @ExceptionHandler(BindException::class)
-    fun handleBindException(ex: BindException): ResponseEntity<Any> =
+    fun handleBindException(ex: BindException): ResponseEntity<ExceptionDto> =
         arrayListOf(messageSourceService.get(code = "validation_error"))
             .apply {
                 ex.bindingResult.allErrors.forEach(
@@ -113,11 +113,11 @@ class RestExceptionHandler(
             }
 
     @ExceptionHandler(ServerException::class)
-    fun handleServerException(ex: ServerException): ResponseEntity<Any> =
+    fun handleServerException(ex: ServerException): ResponseEntity<ExceptionDto> =
         generateResponseEntity(httpStatus = ex.statusCode, omaErrorMessageType = ex.omaErrorMessageType, variables = ex.variables)
 
     @ExceptionHandler(Exception::class)
-    fun handleGeneralException(ex: Exception): ResponseEntity<Any> =
+    fun handleGeneralException(ex: Exception): ResponseEntity<ExceptionDto> =
         generateResponseEntity(
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
             variables = arrayOf(messageSourceService.get(code = "server_error"), ex.message),
@@ -132,7 +132,7 @@ class RestExceptionHandler(
         httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
         omaErrorMessageType: OmaErrorMessageType,
         variables: Array<String?>
-    ): ResponseEntity<Any> =
+    ): ResponseEntity<ExceptionDto> =
         log.error("Exception is handled. HttpStatus: $httpStatus, OmaErrorMessageType: $omaErrorMessageType, variables: ${variables.toList()}")
             .run { ExceptionDto() }
             .apply {
