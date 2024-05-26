@@ -4,13 +4,16 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.senocak.auth.domain.dto.DebeziumUserMessage
+import com.github.senocak.auth.kafka.producer.DLTKafkaProducer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.SmartLifecycle
 import org.springframework.stereotype.Service
 
 @Service
-class PostgresqlChangesConsumer : AbstractKafkaConsumer(), SmartLifecycle {
+class PostgresqlChangesConsumerUser(
+    private val dlt: DLTKafkaProducer
+): AbstractKafkaConsumer(dlt = dlt), SmartLifecycle {
     private var running: Boolean = false
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 

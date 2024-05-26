@@ -1,6 +1,7 @@
 package com.github.senocak.auth.kafka.consumer
 
 import com.github.senocak.auth.domain.dto.TpsInfo
+import com.github.senocak.auth.kafka.producer.DLTKafkaProducer
 import com.github.senocak.auth.util.logger
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -13,7 +14,9 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-abstract class AbstractKafkaConsumer : IKafkaClient {
+abstract class AbstractKafkaConsumer(
+    private val dlt: DLTKafkaProducer
+): IKafkaClient {
     protected val log: Logger by logger()
     protected var messageExecutor: ExecutorService? = Executors.newFixedThreadPool(N_THREADS)
     private var msgConsumerList: MutableList<KafkaMsgConsumer> = ArrayList<KafkaMsgConsumer>()
@@ -52,7 +55,8 @@ abstract class AbstractKafkaConsumer : IKafkaClient {
                 consumer = KafkaConsumer(properties)
                 consumer.subscribe(listOf(element = topicName))
 
-                val messageConsumer = KafkaMsgConsumer(consumer = consumer, threadNumber = threadNumber, owner = this, applicationName = applicationName)
+                val messageConsumer = KafkaMsgConsumer(consumer = consumer, threadNumber = threadNumber, owner = this,
+                    applicationName = applicationName, dlt = dlt)
 
                 "${javaClass.simpleName}-$topicName-$threadNumber"
                     .apply { Thread(messageConsumer::run, this).start() }

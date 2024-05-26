@@ -19,3 +19,9 @@ data class BucketMessageTemplate(
 ) {
     var createdTime: Long = Date().time
 }
+
+class DLTDto(
+    var topic: String,
+    var data: String,
+    var exception: String,
+)

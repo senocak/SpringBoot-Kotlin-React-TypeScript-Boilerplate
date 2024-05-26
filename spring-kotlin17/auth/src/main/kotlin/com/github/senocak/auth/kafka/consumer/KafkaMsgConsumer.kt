@@ -1,5 +1,9 @@
 package com.github.senocak.auth.kafka.consumer
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.github.senocak.auth.domain.dto.DLTDto
+import com.github.senocak.auth.kafka.producer.DLTKafkaProducer
 import com.github.senocak.auth.util.logger
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
@@ -15,9 +19,11 @@ class KafkaMsgConsumer(
     private val consumer: KafkaConsumer<String, String>,
     private val threadNumber: Int,
     private val owner: IKafkaClient,
-    private val applicationName: String
+    private val applicationName: String,
+    private val dlt: DLTKafkaProducer
 ) : Runnable {
     private val log: Logger by logger()
+    private val objectMapper: ObjectMapper = jacksonObjectMapper()
 
     // the variable provides stop consuming message by consumer
     @Volatile
@@ -38,22 +44,29 @@ class KafkaMsgConsumer(
                     Consumer<ConsumerRecord<String, String>> { consumerRecord: ConsumerRecord<String, String> ->
                         val fromHeader: Header? = consumerRecord.headers()
                             .find { header: Header -> ("from" == header.key()) && (applicationName == String(bytes = consumerRecord.headers().first().value(), charset = Charset.defaultCharset())) }
-                        if (fromHeader != null) {
+                        if (fromHeader != null && consumerRecord.topic() != "dead-letter-queue") {
                             log.warn("Message consumed by produced service so ignoring...")
                             return@Consumer
                         }
-                        log.info(
-                            """
+                        log.info("""
                         consumerRecord.headers. ${consumerRecord.headers()}
                         key: ${consumerRecord.key()}
                         value: ${consumerRecord.value()}
                         partition: ${consumerRecord.partition()}
                         topic: ${consumerRecord.topic()}
                         offset: ${consumerRecord.offset()}
-                        threadNumber:$threadNumber
-                    """
-                        )
-                        owner.processMessage(consumerRecord = consumerRecord)
+                        threadNumber:$threadNumber""")
+                        try {
+                            owner.processMessage(consumerRecord = consumerRecord)
+                        } catch (e: Exception) {
+                            try {
+                                dlt.produce(msg = objectMapper.writeValueAsString(DLTDto(topic = consumerRecord.topic(),
+                                    data = consumerRecord.value(), exception = "${e.message}")))
+                                log.info("Message sent to DLQ, key: ${consumerRecord.key()}, value: ${consumerRecord.value()}")
+                            } catch (e: Exception) {
+                                log.error("Failed to send message to DLQ, key: ${consumerRecord.key()}, value: ${consumerRecord.value()}")
+                            }
+                        }
                     }
                 )
             } catch (e: Exception) {

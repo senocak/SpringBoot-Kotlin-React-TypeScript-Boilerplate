@@ -1,6 +1,7 @@
 package com.github.senocak.auth.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.senocak.auth.domain.dto.ExceptionDto
 import com.github.senocak.auth.exception.RestExceptionHandler
 import com.github.senocak.auth.util.logger
 import jakarta.servlet.http.HttpServletRequest
@@ -23,7 +24,7 @@ class JwtAuthenticationEntryPoint(
     @Throws(IOException::class)
     override fun commence(request: HttpServletRequest, response: HttpServletResponse, ex: AuthenticationException) {
         log.error("Responding with unauthorized error. Message - ${ex.message}")
-        val responseEntity: ResponseEntity<Any> = restExceptionHandler.handleUnAuthorized(ex = RuntimeException(ex.message))
+        val responseEntity: ResponseEntity<ExceptionDto> = restExceptionHandler.handleUnAuthorized(ex = RuntimeException(ex.message))
         response.writer.write(objectMapper.writeValueAsString(responseEntity.body))
         response.status = HttpServletResponse.SC_UNAUTHORIZED
         response.contentType = MediaType.APPLICATION_JSON_VALUE
